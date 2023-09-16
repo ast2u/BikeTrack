@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Biketrackcba</string>
+    <string name="my_textlogin"><u>Login</u></string>
+    <string name="my_textregister"><u>Register</u></string>
+</resources>

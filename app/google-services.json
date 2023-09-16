@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "647404157271",
+    "firebase_url": "https://biketrack-e6950-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "biketrack-e6950",
+    "storage_bucket": "biketrack-e6950.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647404157271:android:48e66f8d371cbe4c04e612",
+        "android_client_info": {
+          "package_name": "com.example.biketrackcba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
