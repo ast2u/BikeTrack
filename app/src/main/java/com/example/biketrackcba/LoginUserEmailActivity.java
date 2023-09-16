@@ -34,80 +34,119 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LoginUserEmailActivity extends AppCompatActivity {
-private EditText nEmail,nPass;
-private EditText nrName,nrEmail,nrUsername, nrPass,nrMobile,nrBdate ;
-private TextView regisLayout,loginLayout;
-private DatePickerDialog datepd;
- private Button nLogin, nRegister;
-private FirebaseAuth nAuth;
-private RadioGroup radioGroupRegisterGender;
-private RadioButton radioButtonRegisterGenderSelected;
-private ProgressBar progressBar;
-private static final String TAG = "RegisterLayoutActivity";
-FirebaseDatabase database;
-DatabaseReference reference;
-private FirebaseAuth.AuthStateListener firebaseAuthListener;
+    private EditText nEmail, nPass;
+    private EditText nrName, nrEmail, nrUsername, nrPass, nrMobile, nrBdate;
+    private TextView regisLayout, loginLayout;
+    private DatePickerDialog datepd;
+    private Button nLogin, nRegister;
+    private FirebaseAuth nAuth;
+    private RadioGroup radioGroupRegisterGender;
+    private RadioButton radioButtonRegisterGenderSelected;
+    private ProgressBar progressBar1, progressBar;
+    private static final String TAG = "RegisterLayoutActivity";
+    FirebaseDatabase database;
+    DatabaseReference reference;
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login_user_email);
-
-
-        regisLayout=findViewById(R.id.registertextbutton);
-        loginLayout=findViewById(R.id.logintextbutton);
-        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if(user!=null){
-                   Intent logups = new Intent(LoginUserEmailActivity.this ,Mainmenu.class);
-                    startActivity(logups);
-                    finish();
-                    return;
-                }
-            }
-        };
-
-
-        nEmail = (EditText) findViewById(R.id.idemail);
-        nPass = (EditText) findViewById(R.id.idpassw);
-        nLogin = (Button) findViewById(R.id.nRegisterbut);
-
+        regisLayout = findViewById(R.id.registertextbutton);
+        loginLayout = findViewById(R.id.logintextbutton);
+        nEmail = findViewById(R.id.idemail);
+        nPass = findViewById(R.id.idpassw);
+        nLogin = findViewById(R.id.nLoginbut);
+        progressBar1 = findViewById(R.id.progressBarLogin);
+        nAuth = FirebaseAuth.getInstance();
         nLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String email = nEmail.getText().toString();
-                final String password = nPass.getText().toString();
-                nAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(LoginUserEmailActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(!task.isSuccessful()){
-                            Toast.makeText(LoginUserEmailActivity.this,"Login Error",Toast.LENGTH_SHORT).show();
 
-                        }else{
-                            String user_id = nAuth.getCurrentUser().getUid();
-                            DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child("Bikers").child(user_id);
-                            current_user_db.setValue(true);
-                        }
-                    }
-                });
+                String Lemail = nEmail.getText().toString();
+                String Lpwd = nPass.getText().toString();
 
+                if (TextUtils.isEmpty(Lemail)) {
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Email", Toast.LENGTH_SHORT).show();
+                    nEmail.setError("Email is required");
+                    nEmail.requestFocus();
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(Lemail).matches()) {
+                    Toast.makeText(LoginUserEmailActivity.this, "Please re-enter your Email", Toast.LENGTH_SHORT).show();
+                    nEmail.setError("Valid Email is required");
+                    nEmail.requestFocus();
+                } else if (TextUtils.isEmpty(Lpwd)) {
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Password", Toast.LENGTH_SHORT).show();
+                    nEmail.setError("Password is required");
+                    nEmail.requestFocus();
+                } else {
+                    progressBar1.setVisibility(View.VISIBLE);
+                    loginUser(Lemail, Lpwd);
+                }
             }
         });
 
 
-
-
     }
+
+
+    private void loginUser(String textemail, String textpwd) {
+        nAuth.signInWithEmailAndPassword(textemail,textpwd).addOnCompleteListener(LoginUserEmailActivity.this,new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(LoginUserEmailActivity.this,"Something went wrong!",Toast.LENGTH_LONG).show();
+
+                }
+                progressBar1.setVisibility(View.GONE);
+            }
+        });
+    }
+
 
     public void loginlayoutbutton(View view){
         setContentView(R.layout.activity_login_user_email);
+        nEmail = findViewById(R.id.idemail);
+        nPass = findViewById(R.id.idpassw);
+        nLogin = findViewById(R.id.nLoginbut);
+        progressBar1 = findViewById(R.id.progressBarLogin);
+        nAuth = FirebaseAuth.getInstance();
+        nLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String Lemail = nEmail.getText().toString();
+                String Lpwd = nPass.getText().toString();
+
+                if (TextUtils.isEmpty(Lemail)) {
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Email", Toast.LENGTH_SHORT).show();
+                    nEmail.setError("Email is required");
+                    nEmail.requestFocus();
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(Lemail).matches()) {
+                    Toast.makeText(LoginUserEmailActivity.this, "Please re-enter your Email", Toast.LENGTH_SHORT).show();
+                    nEmail.setError("Valid Email is required");
+                    nEmail.requestFocus();
+                } else if (TextUtils.isEmpty(Lpwd)) {
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Password", Toast.LENGTH_SHORT).show();
+                    nEmail.setError("Password is required");
+                    nEmail.requestFocus();
+                } else {
+                    progressBar1.setVisibility(View.VISIBLE);
+                    loginUser(Lemail, Lpwd);
+                }
+            }
+        });
+
     }
+
+
     @SuppressLint("MissingInflatedId")
     public void registerlayoutbutton(View view){
         setContentView(R.layout.activity_register_user);
@@ -133,8 +172,8 @@ private FirebaseAuth.AuthStateListener firebaseAuthListener;
             @Override
             public void onClick(View view) {
 
-            int selectedGenderId = radioGroupRegisterGender.getCheckedRadioButtonId();
-            radioButtonRegisterGenderSelected = findViewById(selectedGenderId);
+                int selectedGenderId = radioGroupRegisterGender.getCheckedRadioButtonId();
+                radioButtonRegisterGenderSelected = findViewById(selectedGenderId);
 
                 String name = nrName.getText().toString();
                 String email = nrEmail.getText().toString();
@@ -143,31 +182,41 @@ private FirebaseAuth.AuthStateListener firebaseAuthListener;
                 String mobile = nrMobile.getText().toString();
                 String textGender;
                 String password = nrPass.getText().toString();
-                if(TextUtils.isEmpty(name)){
-                    Toast.makeText(LoginUserEmailActivity.this,"Please enter your Full Name",Toast.LENGTH_LONG).show();
+
+                String mobileRegex = "[0][0-9]{9}"; //First no. will be 0 to 11 digits
+                Matcher mobileMatcher;
+                Pattern mobilePattern = Pattern.compile(mobileRegex);
+                mobileMatcher = mobilePattern.matcher(mobile);
+
+                if (TextUtils.isEmpty(name)) {
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Full Name", Toast.LENGTH_LONG).show();
                     nrName.setError("Full Name is Required");
                     nrName.requestFocus();
-                }else if(TextUtils.isEmpty(email)){
-                    Toast.makeText(LoginUserEmailActivity.this,"Please enter your Email Address",Toast.LENGTH_LONG).show();
+                } else if (TextUtils.isEmpty(email)) {
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Email Address", Toast.LENGTH_LONG).show();
                     nrEmail.setError("Email is Required");
                     nrEmail.requestFocus();
                 } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    Toast.makeText(LoginUserEmailActivity.this,"Please re-enter your Email Address",Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginUserEmailActivity.this, "Please re-enter your Email Address", Toast.LENGTH_LONG).show();
                     nrEmail.setError("Valid email is Required");
                     nrEmail.requestFocus();
                 } else if (TextUtils.isEmpty(username)) {
-                    Toast.makeText(LoginUserEmailActivity.this,"Please enter your Username",Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Username", Toast.LENGTH_LONG).show();
                     nrUsername.setError("Username is Required");
                     nrUsername.requestFocus();
                 } else if (TextUtils.isEmpty(bdate)) {
-                    Toast.makeText(LoginUserEmailActivity.this,"Please enter your Birthdate",Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Birthdate", Toast.LENGTH_LONG).show();
                     nrBdate.setError("Birthdate is Required");
                     nrBdate.requestFocus();
                 } else if (TextUtils.isEmpty(mobile)) {
-                    Toast.makeText(LoginUserEmailActivity.this,"Please enter your Mobile Number",Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Mobile Number", Toast.LENGTH_LONG).show();
                     nrMobile.setError("Mobile No. is Required");
                     nrMobile.requestFocus();
-                } else if (radioGroupRegisterGender.getCheckedRadioButtonId()== -1) {
+                }else if(!mobileMatcher.find()){
+                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Mobile Number", Toast.LENGTH_LONG).show();
+                    nrMobile.setError("Mobile No. is not Valid");
+                    nrMobile.requestFocus();
+                }else if (radioGroupRegisterGender.getCheckedRadioButtonId()== -1) {
                     Toast.makeText(LoginUserEmailActivity.this,"Please select your Gender",Toast.LENGTH_LONG).show();
                     radioButtonRegisterGenderSelected.setError("Gender is Required");
                     radioButtonRegisterGenderSelected.requestFocus();
@@ -190,7 +239,8 @@ private FirebaseAuth.AuthStateListener firebaseAuthListener;
                     registerUser(name,email,username,bdate,mobile,textGender,password);
                 }
 
-
+            }
+        });
                 /**
                 database = FirebaseDatabase.getInstance();
 
@@ -213,8 +263,7 @@ private FirebaseAuth.AuthStateListener firebaseAuthListener;
                     return;
                 }
                 **/
-            }
-        });
+
         /**
 
         nRegister.setOnClickListener(new View.OnClickListener() {
