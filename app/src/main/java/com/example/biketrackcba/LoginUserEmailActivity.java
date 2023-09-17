@@ -6,15 +6,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -48,6 +52,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     private RadioButton radioButtonRegisterGenderSelected;
     private ProgressBar progressBar1, progressBar;
     private static final String TAG = "RegisterLayoutActivity";
+    private static final String TAG1 = "LoginLayoutActivity";
     FirebaseDatabase database;
     DatabaseReference reference;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
@@ -65,6 +70,20 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         nLogin = findViewById(R.id.nLoginbut);
         progressBar1 = findViewById(R.id.progressBarLogin);
         nAuth = FirebaseAuth.getInstance();
+        ImageView hidePwdbutton = findViewById(R.id.show_hidepw);
+        hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+        hidePwdbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(nPass.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
+                    nPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+                }else{
+                    nPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    hidePwdbutton.setImageResource(R.drawable.baseline_hide_source_24);
+                }
+            }
+        });
         nLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,14 +119,56 @@ public class LoginUserEmailActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
+                    //Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
+                    FirebaseUser firebaseUser = nAuth.getCurrentUser();
+                    if(firebaseUser.isEmailVerified()){
+                        Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
+                    }else{
+                        firebaseUser.sendEmailVerification();
+                        nAuth.signOut();
+                        showAlertDialog();
+                    }
+
                 }else{
+                    try{
+                        throw task.getException();
+                    } catch (FirebaseAuthUserCollisionException e){
+                     nEmail.setError("User does not Exist or is no longer valid. Please register again.");
+                     nEmail.requestFocus();
+
+                    }catch(FirebaseAuthInvalidCredentialsException e){
+                        nEmail.setError("Invalid credentials. Kindly, check and re-enter.");
+                        nEmail.requestFocus();
+
+                    }catch(Exception e){
+                        Log.e(TAG1,e.getMessage());
+                        Toast.makeText(LoginUserEmailActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                    }
                     Toast.makeText(LoginUserEmailActivity.this,"Something went wrong!",Toast.LENGTH_LONG).show();
 
                 }
                 progressBar1.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginUserEmailActivity.this);
+        builder.setTitle("Email Not Verified");
+        builder.setMessage("Please verify your email now. You can not login without email verification");
+        builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+
+        // show
+        alertDialog.show();
     }
 
 
@@ -118,6 +179,20 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         nLogin = findViewById(R.id.nLoginbut);
         progressBar1 = findViewById(R.id.progressBarLogin);
         nAuth = FirebaseAuth.getInstance();
+        ImageView hidePwdbutton = findViewById(R.id.show_hidepw);
+        hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+        hidePwdbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(nPass.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
+                    nPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+                }else{
+                    nPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    hidePwdbutton.setImageResource(R.drawable.baseline_hide_source_24);
+                }
+            }
+        });
         nLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
