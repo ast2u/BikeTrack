@@ -1,9 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UserProfileActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:orientation="horizontal"
+            android:background="#455B3F">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:padding="7dp"
+                android:layout_marginTop="6dp"
+                android:text="Profile"
+                android:textColor="@color/white"
+                android:textSize="30sp" />
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="43dp"
+                android:layout_gravity="left|center"
+
+                android:layout_marginLeft="223dp"
+                android:src="@drawable/baseline_settings_24" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:background="#6F826A"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="230dp"
+                android:padding="8dp"
+                android:id="@+id/defaultprofilepic"
+                android:src="@drawable/userprofilepic"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:hint="Loading..."
+                android:textColor="@color/white"
+                android:layout_marginTop="6dp"
+                android:textSize="25sp"
+                android:layout_below="@+id/defaultprofilepic"
+                />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</ScrollView>

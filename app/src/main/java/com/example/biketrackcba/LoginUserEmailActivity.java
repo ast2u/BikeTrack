@@ -222,6 +222,20 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(nAuth.getCurrentUser()!=null){
+            Toast.makeText(this, "Already Logged In!", Toast.LENGTH_SHORT).show();
+
+            //START
+            startActivity(new Intent(LoginUserEmailActivity.this,UserProfileActivity.class));
+            finish();
+        }else{
+            Toast.makeText(this, "You can login now!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @SuppressLint("MissingInflatedId")
     public void registerlayoutbutton(View view){
         setContentView(R.layout.activity_register_user);
@@ -394,14 +408,14 @@ public class LoginUserEmailActivity extends AppCompatActivity {
 
                                 Toast.makeText(LoginUserEmailActivity.this,"User Registered successfully. Please verify your Email",
                                         Toast.LENGTH_LONG).show();
-                                /*
+
                                 Intent intent = new Intent(LoginUserEmailActivity.this,UserProfileActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
                                         | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 finish();
 
-                                 */
+
 
                             }else{
                                 Toast.makeText(LoginUserEmailActivity.this,"User Registered failed. Please try again",
