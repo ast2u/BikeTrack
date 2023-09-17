@@ -14,6 +14,7 @@ private Button lgEmail, lgGmail;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lgEmail=findViewById(R.id.loginEmail);
+
         lgEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
