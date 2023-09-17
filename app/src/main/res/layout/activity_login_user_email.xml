@@ -74,6 +74,7 @@
                 android:background="@drawable/custom_edittext"
                 android:inputType="text"
                 android:hint="Email" />
+
             <EditText
                 android:id="@+id/idpassw"
                 android:layout_width="match_parent"
@@ -84,8 +85,16 @@
                 android:layout_marginTop="20dp"
                 android:textColor="@color/black"
                 android:background="@drawable/custom_edittext"
-                android:inputType="text"
+                android:inputType="textPassword"
                 android:hint="Password" />
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:id="@+id/show_hidepw"
+                android:layout_below="@id/idpassw"
+                android:layout_marginLeft="260dp"
+                android:layout_marginTop="-40dp"
+                />
 
             <Button
                 android:id="@+id/nLoginbut"
