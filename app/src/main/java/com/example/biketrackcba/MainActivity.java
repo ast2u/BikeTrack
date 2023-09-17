@@ -20,6 +20,7 @@ private Button lgEmail, lgGmail;
             public void onClick(View view) {
                 Intent intnext = new Intent(MainActivity.this, LoginUserEmailActivity.class);
                 startActivity(intnext);
+                finish();
                 return;
             }
         });
