@@ -2,4 +2,7 @@
     <string name="app_name">Biketrackcba</string>
     <string name="my_textlogin"><u>Login</u></string>
     <string name="my_textregister"><u>Register</u></string>
+    <string name="navigation_drawer_open">Open Navigation drawer</string>
+    <string name="navigation_drawer_close">Close Navigation drawer</string>
+
 </resources>
