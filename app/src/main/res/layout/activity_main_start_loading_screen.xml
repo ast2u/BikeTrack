@@ -22,17 +22,17 @@
         android:src="@drawable/logoapp" />
 
     <TextView
+        android:id="@+id/logoname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/idIVLogo"
+        android:layout_centerHorizontal="true"
+
+        android:fontFamily="@font/contrail_one"
         android:text="BikeTrack"
         android:textColor="@color/black"
-        android:textSize="40sp"
-
-        android:textStyle="bold"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/logoname"
-        />
+        android:textSize="55sp"
+        android:textStyle="bold" />
 
     <!--on below line we are creating progress bar-->
     <ProgressBar
