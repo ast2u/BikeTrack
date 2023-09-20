@@ -121,13 +121,21 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     //Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
                     FirebaseUser firebaseUser = nAuth.getCurrentUser();
+                    Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(LoginUserEmailActivity.this,UserProfileActivity.class);
+                    //Intent intent = new Intent(Intent.ACTION_MAIN);
+                    //intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    /*
                     if(firebaseUser.isEmailVerified()){
-                        Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
+
                     }else{
                         firebaseUser.sendEmailVerification();
                         nAuth.signOut();
                         showAlertDialog();
                     }
+                    */
 
                 }else{
                     try{
@@ -225,9 +233,9 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
         if(nAuth.getCurrentUser()!=null){
             Toast.makeText(this, "Already Logged In!", Toast.LENGTH_SHORT).show();
-
             //START
             startActivity(new Intent(LoginUserEmailActivity.this,UserProfileActivity.class));
             finish();

@@ -16,8 +16,7 @@ public class MainStartLoadingScreen extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main_start_loading_screen);
 
-        // on below line we are calling handler to run a task
-        // for specific time interval
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
