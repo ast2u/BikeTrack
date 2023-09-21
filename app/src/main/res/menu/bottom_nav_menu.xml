@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:title="Map"
+        android:id="@+id/miHome"
+        android:icon="@drawable/baseline_map_24"
+        />
+
+    <item android:title="Socials"
+        android:id="@+id/miSocials"
+        android:icon="@drawable/baseline_people_24"
+        />
+
+    <item android:title=""
+        android:id="@+id/miSOS"
+        />
+
+    <item android:title="Discover"
+        android:id="@+id/miDiscover"
+        android:icon="@drawable/discover_icon"
+
+        />
+
+    <item android:title="Profile"
+        android:id="@+id/miProfile"
+        android:icon="@drawable/baseline_emoji_people_24"
+
+        />
+
+</menu>

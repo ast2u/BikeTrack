@@ -4,5 +4,6 @@
     <string name="my_textregister"><u>Register</u></string>
     <string name="navigation_drawer_open">Open Navigation drawer</string>
     <string name="navigation_drawer_close">Close Navigation drawer</string>
+    <string name="title_activity_maps_main">MapsMainActivity</string>
 
 </resources>
