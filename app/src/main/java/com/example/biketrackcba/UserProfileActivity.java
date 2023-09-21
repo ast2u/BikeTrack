@@ -1,26 +1,24 @@
 package com.example.biketrackcba;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,14 +27,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class UserProfileActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class UserProfileActivity extends AppCompatActivity {
 
     private TextView textVUsern, textVFname, textVEmail,textVbdate, textVgender,textVmobile;
     private ProgressBar progressBar;
+    private Button tempButtonLogout;
     private String usern,fname,Temail,bdate,gender,mobile;
     private ImageView imageRefresh;
     DrawerLayout mDrawerLayout;
-    NavigationView navigationView;
+
+    private BottomNavigationView bottomNavigationView;
 
     private FirebaseAuth nAuthprof;
     @SuppressLint("MissingInflatedId")
@@ -53,10 +53,57 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
         textVmobile = findViewById(R.id.icd_mobileprofile);
 
         //hook
-        imageRefresh = findViewById(R.id.idB_refreshButton);
-        mDrawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+        imageRefresh = findViewById(R.id.idB_settingButton);
+        bottomNavigationView = findViewById(R.id.bottomNavView);
+        Menu menu = bottomNavigationView.getMenu();
+        bottomNavigationView.setSelectedItemId(R.id.miProfile);
+        MenuItem menuItem2 = menu.getItem(2);
+        menuItem2.setEnabled(false);
 
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                int id = item.getItemId();
+                if (id==R.id.miHome){
+                    Intent intent = new Intent(UserProfileActivity.this, MapsMainActivity.class);
+                    startActivity(intent);
+
+
+                } else if (id==R.id.miSocials) {
+
+                } else if (id==R.id.miProfile) {
+                    startActivity(getIntent());
+                    finish();
+                    overridePendingTransition(0,0);
+
+                }
+
+                return false;
+            }
+        });
+
+
+        // Temporary Logout Button
+        tempButtonLogout = findViewById(R.id.logoutbutton);
+        tempButtonLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(UserProfileActivity.this,"Logged Out",Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(UserProfileActivity.this, Loginstarter.class);
+
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                nAuthprof.signOut();
+                startActivity(intent);
+                finish();
+
+            }
+        });
+
+        //  .....
+        /*
+        navigationView = findViewById(R.id.nav_view);
         setSupportActionBar(findViewById(R.id.univ_toolbar));
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
@@ -69,13 +116,19 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
         navigationView.setNavigationItemSelectedListener(this);
 
+         */
+
 
         imageRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(getIntent());
-                finish();
-                overridePendingTransition(0,0);
+                //NEED to BE FIX!
+                ActivityOptions options = ActivityOptions.makeCustomAnimation(UserProfileActivity.this, R.anim.animation_slideright_in, R.anim.animation_slideleft_out);
+                Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
+
+                startActivity(intent, options.toBundle());
+
+
             }
         });
 
@@ -98,6 +151,7 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
     }
 
+    /*
     @Override
     public void onBackPressed() {
 
@@ -108,6 +162,9 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
         }
 
     }
+
+     */
+
     private void showUserProfile(FirebaseUser firebaseUser) {
         String userID = firebaseUser.getUid();
 
@@ -150,16 +207,23 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
     }
 
 
+/*
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int id = menuItem.getItemId();
 
+        if(nAuthprof.getCurrentUser()!=null){
+            Menu menu1 = navigationView.getMenu();
+            menu1.findItem(R.id.nav_logout).setVisible(false);
+            menu1.findItem(R.id.nav_profile).setVisible(false);
+        }
+
         if(id==R.id.nav_home){
-            Intent intent = new Intent(UserProfileActivity.this,Mainmenu.class);
+            Intent intent = new Intent(UserProfileActivity.this, MainscreenActivity.class);
             startActivity(intent);
         }else if(id==R.id.nav_logout){
             Toast.makeText(UserProfileActivity.this,"Logged Out",Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(UserProfileActivity.this,MainActivity.class);
+            Intent intent = new Intent(UserProfileActivity.this, Loginstarter.class);
 
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
                     | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -173,4 +237,6 @@ public class UserProfileActivity extends AppCompatActivity implements Navigation
 
         return true;
     }
+
+ */
 }

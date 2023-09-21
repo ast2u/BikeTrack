@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#6F826A"
-    tools:context=".MainActivity"
+    tools:context=".Loginstarter"
     tools:layout_editor_absoluteX="0dp"
     tools:layout_editor_absoluteY="-1dp">
 

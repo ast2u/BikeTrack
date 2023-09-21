@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class MainActivity extends AppCompatActivity {
+public class Loginstarter extends AppCompatActivity {
 private Button lgEmail, lgGmail;
 private FirebaseAuth nAuth;
 
@@ -25,7 +25,7 @@ private FirebaseAuth nAuth;
         lgEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intnext = new Intent(MainActivity.this, LoginUserEmailActivity.class);
+                Intent intnext = new Intent(Loginstarter.this, LoginUserEmailActivity.class);
                 startActivity(intnext);
                 finish();
                 return;
@@ -40,7 +40,7 @@ private FirebaseAuth nAuth;
         if(nAuth.getCurrentUser()!=null){
             Toast.makeText(this, "Already Logged In!", Toast.LENGTH_SHORT).show();
             //START
-            startActivity(new Intent(MainActivity.this,UserProfileActivity.class));
+            startActivity(new Intent(Loginstarter.this,UserProfileActivity.class));
             finish();
         }else{
             Toast.makeText(this, "You can login now!", Toast.LENGTH_SHORT).show();

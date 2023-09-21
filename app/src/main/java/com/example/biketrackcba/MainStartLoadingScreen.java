@@ -22,7 +22,7 @@ public class MainStartLoadingScreen extends AppCompatActivity {
             public void run() {
                 // on below line we are
                 // creating a new intent
-                Intent i = new Intent(MainStartLoadingScreen.this, MainActivity.class);
+                Intent i = new Intent(MainStartLoadingScreen.this, Loginstarter.class);
 
                 // on below line we are
                 // starting a new activity.

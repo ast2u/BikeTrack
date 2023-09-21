@@ -119,7 +119,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    //Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
                     FirebaseUser firebaseUser = nAuth.getCurrentUser();
                     Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(LoginUserEmailActivity.this,UserProfileActivity.class);
@@ -354,7 +354,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                     HelperClass helperClass = new HelperClass(name, email, username, password, bdate);
                     reference.child(name).setValue(helperClass);
                     Toast.makeText(LoginUserEmailActivity.this, "You have Registered successfully", Toast.LENGTH_SHORT).show();
-                    Intent regisdone = new Intent(LoginUserEmailActivity.this, Mainmenu.class);
+                    Intent regisdone = new Intent(LoginUserEmailActivity.this, MainscreenActivity.class);
                     startActivity(regisdone);
                     finish();
                     return;
