@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Permission Required"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dialog_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Allow access to your location?"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/allow_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Allow" />
+
+    <Button
+        android:id="@+id/deny_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Deny" />
+
+</LinearLayout>
