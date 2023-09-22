@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -16,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Biketrackcba"
         tools:targetApi="31">
-
+        <activity
+            android:name=".MapsSampleActivity"
+            android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -28,8 +31,6 @@
              project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
              "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
         -->
-
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8" />
@@ -47,7 +48,6 @@
         <activity
             android:name=".UserProfileActivity"
             android:exported="false" />
-
         <activity
             android:name=".LoginUserEmailActivity"
             android:exported="false" />

@@ -34,7 +34,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private Button tempButtonLogout;
     private String usern,fname,Temail,bdate,gender,mobile;
     private ImageView imageRefresh;
-    DrawerLayout mDrawerLayout;
+
 
     private BottomNavigationView bottomNavigationView;
 
@@ -66,7 +66,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
                 int id = item.getItemId();
                 if (id==R.id.miHome){
-                    Intent intent = new Intent(UserProfileActivity.this, MapsMainActivity.class);
+                    Intent intent = new Intent(UserProfileActivity.this, MapsSampleActivity.class);
                     startActivity(intent);
 
 
