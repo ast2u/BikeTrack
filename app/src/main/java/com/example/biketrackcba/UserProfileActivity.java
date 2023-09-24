@@ -123,10 +123,9 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //NEED to BE FIX!
-                ActivityOptions options = ActivityOptions.makeCustomAnimation(UserProfileActivity.this, R.anim.animation_slideright_in, R.anim.animation_slideleft_out);
                 Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
-
-                startActivity(intent, options.toBundle());
+                startActivity(intent);
+                overridePendingTransition(R.anim.animation_slideright_in,R.anim.animation_slideleft_out);
 
 
             }

@@ -35,10 +35,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8" />
 
-        <activity
-            android:name=".MapsMainActivity"
-            android:exported="false"
-            android:label="@string/title_activity_maps_main" />
+        <meta-data
+            android:name="com.google.android.places.API_KEY"
+            android:value="AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8" />
+
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />
