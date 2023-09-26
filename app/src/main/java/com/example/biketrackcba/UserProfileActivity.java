@@ -68,9 +68,18 @@ public class UserProfileActivity extends AppCompatActivity {
                 if (id==R.id.miHome){
                     Intent intent = new Intent(UserProfileActivity.this, MapsSampleActivity.class);
                     startActivity(intent);
+                    finish();
 
 
                 } else if (id==R.id.miSocials) {
+                    Intent intent = new Intent(UserProfileActivity.this, UserSocialsActivity.class);
+                    startActivity(intent);
+                    finish();
+
+                } else if (id==R.id.miDiscover) {
+                    Intent intent = new Intent(UserProfileActivity.this, DiscoverUserActivity.class);
+                    startActivity(intent);
+                    finish();
 
                 } else if (id==R.id.miProfile) {
                     startActivity(getIntent());
@@ -122,10 +131,10 @@ public class UserProfileActivity extends AppCompatActivity {
         imageRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //NEED to BE FIX!
+
                 Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.animation_slideright_in,R.anim.animation_slideleft_out);
+                overridePendingTransition(2,2);
 
 
             }
