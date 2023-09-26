@@ -18,8 +18,15 @@
         android:theme="@style/Theme.Biketrackcba"
         tools:targetApi="31">
         <activity
-            android:name=".MapsSampleActivity"
+            android:name=".DiscoverUserActivity"
             android:exported="false" />
+        <activity
+            android:name=".UserSocialsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MapsSampleActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -34,7 +41,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8" />
-
         <meta-data
             android:name="com.google.android.places.API_KEY"
             android:value="AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8" />

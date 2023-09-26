@@ -8,28 +8,20 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 
 tools:context=".MapsSampleActivity" >
-<LinearLayout
+
+
+
+    <!--
+    <FrameLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:elevation="1dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:visibility="gone"
+    android:layout_margin="10dp"
     android:id="@+id/layout_listplaces">
-    <SearchView
-        android:id="@+id/mSearch1_location"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:layout_margin="6dp"
-        android:background="@drawable/bg_searchbutton"
-        android:visibility="invisible"
-        android:queryHint="Search a place..." />
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/places_list"/>
-</LinearLayout>
+
+
+</FrameLayout>
+-->
 <fragment
     android:id="@+id/mapFragment"
     android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -41,12 +33,39 @@ tools:context=".MapsSampleActivity" >
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+
+        <SearchView
+            android:id="@+id/mSearch1_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_searchbutton"
+            android:queryHint="Search a place..."
+            android:visibility="gone"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/mSearch_layout"
+
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:visibility="gone"
+            >
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/lsuggestions_list"/>
+        </LinearLayout>
+
         <Button
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:id="@+id/mSearch_butt"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="9dp"
+            android:layout_marginTop="15dp"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
             android:background="@drawable/baseline_search_24" />
 
 
@@ -74,8 +93,6 @@ tools:context=".MapsSampleActivity" >
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
-
-
     android:theme="@style/Theme.MaterialComponents"
     app:fabCradleMargin="12dp"
     app:fabCradleRoundedCornerRadius="20dp"
