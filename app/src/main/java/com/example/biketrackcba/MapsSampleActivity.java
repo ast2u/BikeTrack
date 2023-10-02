@@ -14,6 +14,7 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,10 +27,7 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 
 import android.content.pm.PackageManager;
@@ -91,7 +89,7 @@ import com.google.maps.model.EncodedPolyline;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -346,8 +344,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                     mMap.addMarker(new MarkerOptions().position(destinationLocation).title(placeName));
                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(destinationLocation, 16));
                                     LatLng originLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                                    String locationString = "Lat: " + location.getLatitude() + ", Lng: " + location.getLongitude();
-                                    text_Location.setText(locationString);
+                                  //  String locationString = "Lat: " + location.getLatitude() + ", Lng: " + location.getLongitude();
                                     text_Destination.setText(placeName);
                                     layoutDestination.setVisibility(View.VISIBLE);
                                     start_destin1.setOnClickListener(new View.OnClickListener() {
@@ -366,6 +363,14 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                             layoutDestination.setVisibility(View.GONE);
                                             sViewB.setVisibility(View.VISIBLE);
                                             isDestination_canceled = true;
+                                            CameraPosition cameraPosition = new CameraPosition.Builder()
+                                                    .target(mMap.getCameraPosition().target) // Keep the same target position
+                                                    .zoom(mMap.getCameraPosition().zoom) // Keep the same zoom level
+                                                    .bearing(mMap.getCameraPosition().bearing) // Keep the same bearing (if needed)
+                                                    .tilt(0) // Reset the tilt to 0 degrees
+                                                    .build();
+                                            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                            mMap.getUiSettings().setAllGesturesEnabled(true);
                                         }
                                     });
 
@@ -493,7 +498,10 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                         }
 
                         if(destination_enabled && !isDestination_canceled){
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userL,20));
+
+                            BearingMapUtils.setCameraBearing(mMap,userL, new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude()));
+                            mMap.getUiSettings().setAllGesturesEnabled(false);
+                            mMap.getUiSettings().setRotateGesturesEnabled(true);
                         }
                         float distance = prevLocation.distanceTo(smoothLocate);
 

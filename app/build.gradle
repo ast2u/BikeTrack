@@ -8,6 +8,12 @@ android {
     namespace 'com.example.biketrackcba'
     compileSdk 33
 
+    lintOptions {
+        checkReleaseBuilds false
+        // Add the following line to enable lint checks with deprecation warnings
+        warning 'deprecation'
+    }
+
     defaultConfig {
         applicationId "com.example.biketrackcba"
         minSdk 26

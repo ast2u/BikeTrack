@@ -85,7 +85,7 @@ tools:context=".MapsSampleActivity" >
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="18dp"
                 android:layout_below="@id/mDirections_icon"
                 android:background="@color/greendark"
                 android:id="@+id/divider_mDirections"
@@ -99,16 +99,18 @@ tools:context=".MapsSampleActivity" >
                 android:layout_below="@id/divider_mDirections"
                 android:id="@+id/mcLocation_icon"
                 android:src="@drawable/baseline_place_24"/>
+
             <TextView
+                android:id="@+id/text_printcLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/text_printcLocation"
-                android:layout_marginStart="10dp"
                 android:layout_below="@id/divider_mDirections"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="18dp"
                 android:layout_toRightOf="@id/mcLocation_icon"
+                android:text="User Location"
                 android:textSize="17sp"
-                android:text="SAMPLE LOCATION TITLE"/>
+                android:textStyle="bold" />
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
