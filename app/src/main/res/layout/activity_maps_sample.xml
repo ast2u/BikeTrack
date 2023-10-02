@@ -20,8 +20,6 @@ tools:context=".MapsSampleActivity" >
     />
 
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -35,48 +33,135 @@ tools:context=".MapsSampleActivity" >
             android:layout_margin="6dp"
             android:background="@drawable/bg_searchbutton"
             android:queryHint="Search a place..."
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
+
         <LinearLayout
+            android:id="@+id/mSearch_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/mSearch_layout"
 
             android:background="@color/white"
             android:orientation="vertical"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
+
             <ListView
+                android:id="@+id/lsuggestions_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/lsuggestions_list"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
         <Button
+            android:id="@+id/mSearch_butt"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:id="@+id/mSearch_butt"
-            android:layout_marginTop="15dp"
             android:layout_gravity="right"
+            android:layout_marginTop="15dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/baseline_search_24" />
+        <RelativeLayout
+            android:id="@+id/mDestination_starter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="7dp"
+            android:padding="10dp"
+            android:visibility="gone"
+            android:background="@drawable/custom_edittext2">
+            <!--show directions-->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="7dp"
+                android:id="@+id/mDirections_icon"
+                android:src="@drawable/baseline_directions_24"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_printDirection"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_toRightOf="@id/mDirections_icon"
+                android:textSize="17sp"
+                android:text="SAMPLE DIRECTION TITLE"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/mDirections_icon"
+                android:background="@color/greendark"
+                android:id="@+id/divider_mDirections"
+                />
+            <!--show currentLocation-->
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="7dp"
+                android:layout_marginTop="15dp"
+                android:layout_below="@id/divider_mDirections"
+                android:id="@+id/mcLocation_icon"
+                android:src="@drawable/baseline_place_24"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_printcLocation"
+                android:layout_marginStart="10dp"
+                android:layout_below="@id/divider_mDirections"
+                android:layout_marginTop="18dp"
+                android:layout_toRightOf="@id/mcLocation_icon"
+                android:textSize="17sp"
+                android:text="SAMPLE LOCATION TITLE"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/mcLocation_icon"
+                android:background="@color/greendark"
+                android:id="@+id/divider_mLocation"
+                />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/D_startDestination"
+                android:layout_below="@id/divider_mLocation"
+                android:background="@drawable/rounded_corner"
+                android:text="Start Destination"
+                android:layout_marginTop="20dp"
+                android:padding="10dp"
+                android:textAllCaps="false"
+                android:layout_marginRight="100dp"
+                android:layout_alignRight="@id/D_cancel"
+                android:textSize="15sp" />
+            <Button
+                android:layout_width="wrap_content"
+                android:id="@+id/D_cancel"
+                android:layout_alignParentRight="true"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:layout_below="@id/divider_mLocation"
+                android:background="@drawable/rounded_corner1"
+                android:layout_marginTop="20dp"
 
+                />
+
+
+
+
+        </RelativeLayout>
 
         <FrameLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="10dp"
-    android:layout_marginTop="50dp"
-    android:layout_gravity="right"
-    android:layout_marginBottom="16dp"
-    android:background="@drawable/shape_whitebg">
-        <Button
-            android:id="@+id/my_location_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/baseline_center_focus_strong_24"
-             />
-</FrameLayout>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/shape_whitebg">
+
+            <Button
+                android:id="@+id/my_location_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/baseline_center_focus_strong_24" />
+        </FrameLayout>
 
 
     </LinearLayout>

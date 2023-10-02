@@ -33,4 +33,17 @@ private FirebaseAuth nAuth;
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(nAuth.getCurrentUser()!=null){
+            Toast.makeText(this, "Already Logged In!", Toast.LENGTH_SHORT).show();
+            //START
+            startActivity(new Intent(Loginstarter.this,UserProfileActivity.class));
+            finish();
+        }else{
+            Toast.makeText(this, "You can login now!", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

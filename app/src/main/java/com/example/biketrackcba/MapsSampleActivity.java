@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -53,7 +54,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -88,7 +91,9 @@ import com.google.maps.model.EncodedPolyline;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -101,7 +106,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private Location prevLocation;
 
 
-    private Button sViewB, centerB;
+    private Button sViewB, centerB,start_destin1,cancel_destin1;
 
     BottomNavigationView bottomNavigationView;
     private SearchView sView;
@@ -111,13 +116,17 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private PlacesClient placesC;
 
     LinearLayout layoutSearch;
+    RelativeLayout layoutDestination;
     private ListView suggestionsListView;
     private ArrayAdapter<String> suggestionAdapter;
     private List<String> suggestionList;
     private Polyline currentPolyLine;
 
+    private TextView text_Destination, text_Location;
 
     private static final float DISTANCE_THRESHOLD = 10;
+    private boolean destination_enabled = false;
+    private boolean isDestination_canceled = false;
 
 
     @Override
@@ -138,7 +147,12 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
 
         layoutSearch = findViewById(R.id.mSearch_layout);
+        layoutDestination = findViewById(R.id.mDestination_starter);
         suggestionsListView = findViewById(R.id.lsuggestions_list);
+        text_Destination = findViewById(R.id.text_printDirection);
+        start_destin1 = findViewById(R.id.D_startDestination);
+        cancel_destin1 = findViewById(R.id.D_cancel);
+        text_Location = findViewById(R.id.text_printcLocation);
         suggestionList = new ArrayList<>();
         suggestionAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, suggestionList);
 
@@ -148,9 +162,14 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
                 String selectedSuggestion = suggestionList.get(pos);
-                getPlaceDetails(selectedSuggestion);
 
+
+                getPlaceDetails(selectedSuggestion);
                 hideSearchView();
+
+
+
+
 
             }
         });
@@ -163,7 +182,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
             @Override
             public boolean onQueryTextChange(String nText) {
-                performSearch(nText);
+                PlaceSearchHelper.performSearch(nText,placesC,suggestionAdapter,suggestionList);
                 return true;
             }
         });
@@ -252,9 +271,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         sView.startAnimation(hideAnimation);
         sView.setVisibility(View.GONE);
 
-        Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.animation_fade_in);
-        sViewB.startAnimation(fadeInAnimation);
-        sViewB.setVisibility(View.VISIBLE);
+       // Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.animation_fade_in);
+        //sViewB.startAnimation(fadeInAnimation);
+       // sViewB.setVisibility(View.VISIBLE);
     }
 
     private void showSearchView() {
@@ -294,11 +313,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     }
 
 
-    // Search Method
-    private void performSearch(String query) {
-        PlaceSearchHelper.performSearch(query,placesC,suggestionAdapter,suggestionList);
-    }
-
     private void getPlaceDetails(String placeName) {
 
         // List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.LAT_LNG);
@@ -320,7 +334,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 placesC.fetchPlace(placeRequest).addOnSuccessListener((placeResponse) -> {
                     Place place = placeResponse.getPlace();
                     destinationLocation = place.getLatLng();
-
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                             != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
                             Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -330,11 +343,32 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                             @Override
                             public void onSuccess(Location location) {
                                 if (location != null) {
-                                    LatLng originLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                                    getDirections(originLocation, destinationLocation);
-                                    Log.d(TAG,"Success");
                                     mMap.addMarker(new MarkerOptions().position(destinationLocation).title(placeName));
                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(destinationLocation, 16));
+                                    LatLng originLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                    String locationString = "Lat: " + location.getLatitude() + ", Lng: " + location.getLongitude();
+                                    text_Location.setText(locationString);
+                                    text_Destination.setText(placeName);
+                                    layoutDestination.setVisibility(View.VISIBLE);
+                                    start_destin1.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            destination_enabled=true;
+                                            isDestination_canceled=false;
+                                            getDirections(originLocation, destinationLocation);
+                                            Log.d(TAG,"Success");
+                                        }
+                                    });
+                                    cancel_destin1.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            mMap.clear();
+                                            layoutDestination.setVisibility(View.GONE);
+                                            sViewB.setVisibility(View.VISIBLE);
+                                            isDestination_canceled = true;
+                                        }
+                                    });
+
                                 }
                             }
                         });
@@ -445,9 +479,11 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                         double longit = smoothLocate.getLongitude();
                         LatLng userL = new LatLng(latit,longit);
 
+
                         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("BikersAvailable");
                         GeoFire geoFire = new GeoFire(ref);
+
                         geoFire.setLocation(userId, new GeoLocation(smoothLocate.getLatitude(),smoothLocate.getLongitude()));
 
 
@@ -455,11 +491,15 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userL,17));
                             shouldAutoCenterCamera = false;
                         }
+
+                        if(destination_enabled && !isDestination_canceled){
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userL,20));
+                        }
                         float distance = prevLocation.distanceTo(smoothLocate);
 
                         if(distance >=10){
                             prevLocation=smoothLocate;
-                            if(destinationLocation!=null){
+                            if(destinationLocation!=null && !isDestination_canceled){
                                 if(currentPolyLine!=null){
                                     currentPolyLine.remove();
                                 }
@@ -474,8 +514,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             }
         };
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(5000); // Set the desired interval for location updates (in milliseconds)
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000); // Set the desired interval for location updates (in milliseconds)
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
 
@@ -553,7 +593,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                             public void onSuccess(Location location) {
                                 if (location != null) {
                                     LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 20));
+                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 18));
 
                                 }
                             }
