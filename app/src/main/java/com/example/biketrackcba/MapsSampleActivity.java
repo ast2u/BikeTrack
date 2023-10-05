@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -231,8 +232,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         centerB = findViewById(R.id.my_location_button);
         centerB.setOnClickListener(view -> centerMapOnUserLocation());
 
+        clearMarkers();
         cancel_destin2.setOnClickListener(view -> {
-            mMap.clear();
             layoutDestination.setVisibility(View.GONE);
             sViewB.setVisibility(View.VISIBLE);
             layoutD_userDataF.setVisibility(View.GONE);
@@ -397,7 +398,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                         Log.d(TAG,"Success");
                                     });
                                     cancel_destin1.setOnClickListener(view -> {
-                                        mMap.clear();
+                                        clearMarkers();
                                         layoutDestination.setVisibility(View.GONE);
                                         sViewB.setVisibility(View.VISIBLE);
                                     });
@@ -521,6 +522,14 @@ if(directionsThread!=null&& directionsThread.isAlive()){
             }
         }
     }
+
+    private List<Marker> markers = new ArrayList<>();
+    private void clearMarkers(){
+        for (Marker marker: markers){
+            marker.remove();
+        }
+        markers.clear();
+    }
     private boolean shouldAutoCenterCamera = true;
     private Location prevDestinationLocatiom;
     private void startLocationUpdates() {
@@ -605,7 +614,8 @@ if(directionsThread!=null&& directionsThread.isAlive()){
 
                             float distanceInMeters = results[0];
                             if(distanceInMeters<20){
-                                mMap.clear();
+                                clearMarkers();
+
                                 layoutDestination.setVisibility(View.GONE);
                                 sViewB.setVisibility(View.VISIBLE);
                                 layoutD_userDataF.setVisibility(View.GONE);
