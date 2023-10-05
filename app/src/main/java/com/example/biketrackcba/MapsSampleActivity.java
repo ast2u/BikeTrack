@@ -17,15 +17,20 @@ import com.google.android.gms.location.Priority;
 
 import com.google.android.gms.maps.model.CameraPosition;
 
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -97,7 +102,7 @@ import java.util.Date;
 
 import java.util.List;
 import java.util.Locale;
-
+import java.util.concurrent.CompletableFuture;
 
 
 public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -134,6 +139,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private FirebaseUser user;
     private FirebaseDatabase database;
     private TimerService timerService;
+    private DatabaseReference otherUsersRef;
+    private String currentUserId;
 
 
     @Override
@@ -143,12 +150,15 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         checkLocationPermission();
         LocationUtils.checkLocationSettings(this);
         user = FirebaseAuth.getInstance().getCurrentUser();
+        currentUserId = user.getUid();
         database = FirebaseDatabase.getInstance();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
         text_Time=findViewById(R.id.D_time_text);
         timerService = new TimerService(new Handler(Looper.getMainLooper()),text_Time);
+
+        otherUsersRef=database.getReference("BikersAvailable");
 
         Places.initialize(getApplicationContext(), "AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8");
         placesC = Places.createClient(this);
@@ -531,7 +541,7 @@ if(directionsThread!=null&& directionsThread.isAlive()){
                         LatLng userL = new LatLng(latit,longit);
 
 
-                        if(user!=null){
+
                             String userId = user.getUid();
                             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                             String currentDate = dateFormat.format(new Date());
@@ -543,9 +553,6 @@ if(directionsThread!=null&& directionsThread.isAlive()){
                             rtRef.child("timestamp").setValue(currentDate);
 
 
-                        }else{
-                            Log.e(TAG,"No User Online");
-                        }
 
 
 
@@ -714,6 +721,50 @@ if(directionsThread!=null&& directionsThread.isAlive()){
         }
     }
 
+    private List<Circle> otherUsersCircles = new ArrayList<>();
+
+    private void drawOtherUsersCircle(){
+        CompletableFuture.runAsync(()->{
+        otherUsersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+
+
+                    if(userSnapshot.getKey().equals(currentUserId)){
+                        continue;
+                    }
+                    // Assuming each user node has 'latitude' and 'longitude' keys
+                    double latitude = userSnapshot.child("RT_Location/UserLocation/l/0").getValue(Double.class);
+                    double longitude = userSnapshot.child("RT_Location/UserLocation/l/1").getValue(Double.class);
+
+                    // Create a LatLng object from the retrieved coordinates
+                    LatLng userLocation = new LatLng(latitude, longitude);
+
+                    // Create a CircleOptions object to define the circle
+                    CircleOptions circleOptions = new CircleOptions()
+                            .center(userLocation)
+                            .radius(8) // Adjust the radius as needed
+                            .strokeColor(Color.GREEN)
+                            .fillColor(Color.BLUE);
+
+                    // Add the circle to the map
+                    Circle circle = mMap.addCircle(circleOptions);
+                    otherUsersCircles.add(circle);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Failed to retrieve other users' locations", error.toException());
+            }
+        });
+        });
+    }
+
+
+
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -722,6 +773,9 @@ if(directionsThread!=null&& directionsThread.isAlive()){
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
+            drawOtherUsersCircle();
+
+
         }
 
 }
