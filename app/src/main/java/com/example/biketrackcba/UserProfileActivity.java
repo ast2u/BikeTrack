@@ -2,10 +2,10 @@ package com.example.biketrackcba;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
+
 
 import android.annotation.SuppressLint;
-import android.app.ActivityOptions;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -139,9 +139,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
             }
         });
-
-
-
 
 
         nAuthprof = FirebaseAuth.getInstance();
