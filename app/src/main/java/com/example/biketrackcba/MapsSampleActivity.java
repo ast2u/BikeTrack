@@ -3,6 +3,7 @@ package com.example.biketrackcba;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -15,6 +16,8 @@ import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.Priority;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 
 import com.google.android.gms.maps.model.Circle;
@@ -37,10 +40,14 @@ import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
+
+import android.app.AlertDialog;
 import android.content.Intent;
 
 import android.content.pm.PackageManager;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 
@@ -48,6 +55,7 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -99,6 +107,7 @@ import com.google.maps.model.EncodedPolyline;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.Date;
 
 import java.util.List;
@@ -232,8 +241,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         centerB = findViewById(R.id.my_location_button);
         centerB.setOnClickListener(view -> centerMapOnUserLocation());
 
-        clearMarkers();
+
         cancel_destin2.setOnClickListener(view -> {
+            clearMarkers();
             layoutDestination.setVisibility(View.GONE);
             sViewB.setVisibility(View.VISIBLE);
             layoutD_userDataF.setVisibility(View.GONE);
@@ -381,7 +391,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                             @Override
                             public void onSuccess(Location location) {
                                 if (location != null) {
-                                    mMap.addMarker(new MarkerOptions().position(destinationLocation).title(placeName));
+                                    Marker mPlaceMarker = mMap.addMarker(new MarkerOptions().position(destinationLocation).title(placeName));
+                                    Placemarkers.add(mPlaceMarker);
                                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(destinationLocation, 16));
                                     LatLng originLocation = new LatLng(location.getLatitude(), location.getLongitude());
                                     text_Destination.setText(placeName);
@@ -523,12 +534,12 @@ if(directionsThread!=null&& directionsThread.isAlive()){
         }
     }
 
-    private List<Marker> markers = new ArrayList<>();
+    private List<Marker> Placemarkers = new ArrayList<>();
     private void clearMarkers(){
-        for (Marker marker: markers){
+        for (Marker marker: Placemarkers){
             marker.remove();
         }
-        markers.clear();
+        Placemarkers.clear();
     }
     private boolean shouldAutoCenterCamera = true;
     private Location prevDestinationLocatiom;
@@ -731,19 +742,20 @@ if(directionsThread!=null&& directionsThread.isAlive()){
         }
     }
 
-    private List<Circle> otherUsersCircles = new ArrayList<>();
-
-    private void drawOtherUsersCircle(){
+    private List<Marker> otherUsersMarkers = new ArrayList<>();
+    private void drawOtherUsersMarker(){
         CompletableFuture.runAsync(()->{
         otherUsersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-
-
-                    if(userSnapshot.getKey().equals(currentUserId)){
-                        continue;
+                      if(userSnapshot.getKey().equals(currentUserId)){
+                          continue;
+                       }
+                    for (Marker marker : otherUsersMarkers) {
+                        marker.remove();
                     }
+                    // otherUsersMarkers.clear();
                     // Assuming each user node has 'latitude' and 'longitude' keys
                     double latitude = userSnapshot.child("RT_Location/UserLocation/l/0").getValue(Double.class);
                     double longitude = userSnapshot.child("RT_Location/UserLocation/l/1").getValue(Double.class);
@@ -751,19 +763,36 @@ if(directionsThread!=null&& directionsThread.isAlive()){
                     // Create a LatLng object from the retrieved coordinates
                     LatLng userLocation = new LatLng(latitude, longitude);
 
-                    // Create a CircleOptions object to define the circle
-                    CircleOptions circleOptions = new CircleOptions()
-                            .center(userLocation)
-                            .radius(8) // Adjust the radius as needed
-                            .strokeColor(Color.GREEN)
-                            .fillColor(Color.BLUE);
+                    String userId = userSnapshot.getKey();
 
-                    // Add the circle to the map
-                    Circle circle = mMap.addCircle(circleOptions);
-                    otherUsersCircles.add(circle);
-                }
+                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Registered Users").child(userId);
+
+                    usersRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                String username = snapshot.child("username").getValue(String.class);
+                            Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.defaultusermarker);
+                            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap,65, 65, true);
+
+                            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap);
+                                MarkerOptions markerOptions = new MarkerOptions()
+                                        .position(userLocation)
+                                        .title(username)
+                                .icon(icon);
+                                Marker marker = mMap.addMarker(markerOptions);
+
+                                marker.setTag(marker);
+
+                                otherUsersMarkers.add(marker);
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Log.e(TAG, "Failed to retrieve other users' locations", error.toException());
+                        }
+                    });
             }
-
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "Failed to retrieve other users' locations", error.toException());
@@ -771,10 +800,6 @@ if(directionsThread!=null&& directionsThread.isAlive()){
         });
         });
     }
-
-
-
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -783,8 +808,20 @@ if(directionsThread!=null&& directionsThread.isAlive()){
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
-            drawOtherUsersCircle();
+            drawOtherUsersMarker();
 
+            mMap.setOnCameraMoveListener(() -> {
+                float zoomLevel = mMap.getCameraPosition().zoom;
+                if (zoomLevel < 15) {
+                    for (Marker marker : otherUsersMarkers) {
+                        marker.setVisible(false);
+                    }
+                } else {
+                    for (Marker marker : otherUsersMarkers) {
+                        marker.setVisible(true);
+                    }
+                }
+            });
 
         }
 
