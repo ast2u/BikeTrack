@@ -8,10 +8,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SearchView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class DiscoverUserActivity extends AppCompatActivity {
+public class DiscoverUserActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
 private BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +23,10 @@ private BottomNavigationView bottomNavigationView;
         bottomNavigationView.setSelectedItemId(R.id.miDiscover);
         MenuItem menuItem2 = menu.getItem(2);
         menuItem2.setEnabled(false);
+
+        SearchView searchView = findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(this);
+
 
         bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
@@ -52,5 +57,15 @@ private BottomNavigationView bottomNavigationView;
                 return false;
             }
         });
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+        return false;
     }
 }
