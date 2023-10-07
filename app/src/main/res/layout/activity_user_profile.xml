@@ -81,6 +81,8 @@
                 android:layout_centerHorizontal="true"
                 android:hint="Loading..."
                 android:textColor="@color/white"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:layout_marginTop="6dp"
                 android:layout_marginBottom="15dp"
                 android:textSize="25sp"
