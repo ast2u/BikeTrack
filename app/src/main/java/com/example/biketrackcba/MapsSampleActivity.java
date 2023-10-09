@@ -4,13 +4,15 @@ import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+
 import android.Manifest;
 
 import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
+
 
 
 import com.google.android.gms.location.LocationRequest;
@@ -20,8 +22,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
+
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -41,7 +42,9 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 
+
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.content.pm.PackageManager;
@@ -55,7 +58,9 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Html;
+;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,7 +69,7 @@ import android.view.animation.Animation;
 
 import android.view.animation.AnimationUtils;
 
-import android.widget.AdapterView;
+
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -104,14 +109,13 @@ import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
 
 
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Currency;
-import java.util.Date;
+
 
 import java.util.List;
-import java.util.Locale;
+
 import java.util.concurrent.CompletableFuture;
 
 
@@ -126,31 +130,35 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private Location prevLocation;
     private Thread directionsThread;
 
-    private Button sViewB, centerB,start_destin1,cancel_destin1,cancel_destin2;
+    private Button sViewB, centerB, start_destin1, cancel_destin1, cancel_destin2;
+    private Button button_StartRTrack;
 
     BottomNavigationView bottomNavigationView;
     private SearchView sView;
     FloatingActionButton sos_button;
 
-
     private PlacesClient placesC;
 
     private LinearLayout layoutSearch;
-    private RelativeLayout layoutDestination,layoutD_userDataF;
+    private RelativeLayout layoutDestination, layoutD_startRouting2;
+    private CardView RcardView;
     private ListView suggestionsListView;
     private ArrayAdapter<String> suggestionAdapter;
     private List<String> suggestionList;
     private Polyline currentPolyLine;
+    private List<Polyline> routePolyline = new ArrayList<>();
 
-    private TextView text_Destination, text_Location,text_Speed,text_Time,text_Distance;
+    private TextView text_Destination, text_Location, text_Speed, text_Time, text_Distance;
 
     private boolean destination_enabled = false;
-    private boolean isDestination_canceled =true;
+    private boolean isDestination_canceled = true;
     private FirebaseUser user;
     private FirebaseDatabase database;
     private TimerService timerService;
     private DatabaseReference otherUsersRef;
     private String currentUserId;
+    private LocationUpdaterFirebase locationUpdaterFirebase;
+    private List<LatLng> routePoints = new ArrayList<>();
 
 
     @Override
@@ -165,22 +173,27 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
+        locationUpdaterFirebase = new LocationUpdaterFirebase(this);
 
-        text_Time=findViewById(R.id.D_time_text);
-        timerService = new TimerService(new Handler(Looper.getMainLooper()),text_Time);
 
-        otherUsersRef=database.getReference("BikersAvailable");
-        locationUploadHelper = new LocationUploadHelper();
+
+        text_Time = findViewById(R.id.D_time_text);
+        timerService = new TimerService(new Handler(Looper.getMainLooper()), text_Time);
+
+        otherUsersRef = database.getReference("BikersAvailable");
 
         Places.initialize(getApplicationContext(), "AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8");
         placesC = Places.createClient(this);
 
-
         layoutSearch = findViewById(R.id.mSearch_layout);
-        layoutD_userDataF = findViewById(R.id.layoutstart_routing);
-        layoutDestination = findViewById(R.id.mDestination_starter);
-        text_Speed = findViewById(R.id.D_speed_text);
 
+        RcardView = findViewById(R.id.routing_CardView);
+        layoutD_startRouting2 = findViewById(R.id.layoutstart_routing);
+
+        layoutDestination = findViewById(R.id.mDestination_starter);
+
+        text_Speed = findViewById(R.id.D_speed_text);
+        button_StartRTrack = findViewById(R.id.start_RouteTrackingBT);
         suggestionsListView = findViewById(R.id.lsuggestions_list);
         text_Destination = findViewById(R.id.text_printDirection);
         start_destin1 = findViewById(R.id.D_startDestination);
@@ -192,26 +205,22 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         sView = findViewById(R.id.mSearch1_location);
         suggestionsListView.setAdapter(suggestionAdapter);
-        suggestionsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                String selectedSuggestion = suggestionList.get(pos);
-                getPlaceDetails(selectedSuggestion);
-                hideSearchView();
-                sViewB.setVisibility(View.GONE);
+        suggestionsListView.setOnItemClickListener((adapterView, view, pos, id) -> {
+            String selectedSuggestion = suggestionList.get(pos);
+            getPlaceDetails(selectedSuggestion);
+            hideSearchView();
+            sViewB.setVisibility(View.GONE);
 
-            }
         });
         sView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String nText) {
-                PlaceSearchHelper.performSearch(nText,placesC,suggestionAdapter,suggestionList);
+                PlaceSearchHelper.performSearch(nText, placesC, suggestionAdapter, suggestionList);
                 return true;
             }
         });
@@ -222,28 +231,38 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         menuItem2.setEnabled(false);
         sViewB = findViewById(R.id.mSearch_butt);
         sos_button = findViewById(R.id.start_sosButton);
-        sViewB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleSearchView();
-
-            }
+        ;
+        button_StartRTrack.setOnClickListener(view -> {
+            startRoutePoints = true;
+            toggleroutingLayout();
         });
+
+        sViewB.setOnClickListener(view -> toggleSearchView());
         sView.setOnCloseListener(() -> {
             hideSearchView();
-
             return true;
         });
 
         centerB = findViewById(R.id.my_location_button);
         centerB.setOnClickListener(view -> centerMapOnUserLocation());
 
+        //end Button
         cancel_destin2.setOnClickListener(view -> {
             clearMarkers();
-            layoutDestination.setVisibility(View.GONE);
+            if (layoutD_startRouting2.getVisibility() == View.VISIBLE) {
+                TransitionManager.beginDelayedTransition(RcardView, new AutoTransition());
+                layoutD_startRouting2.setVisibility(View.GONE);
+                button_StartRTrack.setVisibility(View.VISIBLE);
+            }
+            if(startRoutePoints==true){
+                startRoutePoints=false;
+                saveRouteToDatabaseWithDialog();
+            }
             sViewB.setVisibility(View.VISIBLE);
-            layoutD_userDataF.setVisibility(View.GONE);
-            stopDirections();
+            timerService.resetTimer();
+            if (destination_enabled == true && isDestination_canceled == false) {
+                stopDirections();
+            }
         });
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -271,6 +290,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             }
         });
     }
+
     private void toggleSearchView() {
         if (sView.getVisibility() == View.VISIBLE) {
             hideSearchView();
@@ -278,6 +298,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             showSearchView();
         }
     }
+
     private void hideSearchView() {
         Animation hideAnimation = AnimationUtils.loadAnimation(this, R.anim.animation_searchhide);
         layoutSearch.startAnimation(hideAnimation);
@@ -300,10 +321,11 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     }
 
     private void stopLocationUpdates() {
-        if(locationCallback!=null || fusedLocationClient!=null) {
+        if (locationCallback != null || fusedLocationClient != null) {
             Log.d(TAG, "location have stopped");
             fusedLocationClient.removeLocationUpdates(locationCallback);
         }
+        locationUpdaterFirebase.stopLocationFirebaseUpdates();
     }
 
     @Override
@@ -312,14 +334,12 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         stopLocationUpdates();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
         checkLocationPermission();
 
     }
-
 
     @Override
     protected void onDestroy() {
@@ -337,7 +357,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onStop() {
         super.onStop();
-        locationUploadHelper.stopLocationUpdates();
         String userId = user.getUid();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("BikersAvailable");
         GeoFire geoFire = new GeoFire(ref);
@@ -347,6 +366,16 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     }
 
 
+    private void toggleroutingLayout() {
+        if (layoutD_startRouting2.getVisibility() == View.GONE) {
+            timerService.run();
+            TransitionManager.beginDelayedTransition(RcardView, new AutoTransition());
+            layoutD_startRouting2.setVisibility(View.VISIBLE);
+            button_StartRTrack.setVisibility(View.GONE);
+        }
+
+
+    }
 
     private void getPlaceDetails(String placeName) {
         AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
@@ -372,54 +401,54 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                             Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                     }
-                        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    Marker mPlaceMarker = mMap.addMarker(new MarkerOptions().position(destinationLocation).title(placeName));
-                                    Placemarkers.add(mPlaceMarker);
-                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(destinationLocation, 16));
-                                    LatLng originLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                                    text_Destination.setText(placeName);
-                                    layoutDestination.setVisibility(View.VISIBLE);
-                                    start_destin1.setOnClickListener(view -> {
+                    fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                Marker mPlaceMarker = mMap.addMarker(new MarkerOptions().position(destinationLocation).title(placeName));
+                                Placemarkers.add(mPlaceMarker);
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(destinationLocation, 16));
+                                LatLng originLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                text_Destination.setText(placeName);
+                                layoutDestination.setVisibility(View.VISIBLE);
+                                start_destin1.setOnClickListener(view -> {
 
-                                        layoutDestination.setVisibility(View.GONE);
-                                        layoutD_userDataF.setVisibility(View.VISIBLE);
-                                            getDirections(originLocation, destinationLocation);
-                                        destination_enabled=true;
-                                        isDestination_canceled=false;
-                                        timerService.run();
+                                    layoutDestination.setVisibility(View.GONE);
+                                    toggleroutingLayout();
+                                    getDirections(originLocation, destinationLocation);
+                                    destination_enabled = true;
+                                    isDestination_canceled = false;
 
-                                        Log.d(TAG,"Success");
-                                    });
-                                    cancel_destin1.setOnClickListener(view -> {
-                                        clearMarkers();
-                                        layoutDestination.setVisibility(View.GONE);
-                                        sViewB.setVisibility(View.VISIBLE);
-                                    });
+                                    Log.d(TAG, "Success");
+                                });
+                                cancel_destin1.setOnClickListener(view -> {
+                                    clearMarkers();
+                                    layoutDestination.setVisibility(View.GONE);
+                                    sViewB.setVisibility(View.VISIBLE);
+                                });
 
-                                }
                             }
-                        });
-                        }).addOnFailureListener((exception)->{
-                            Log.e("Place Details", "Error getting place details", exception);
-                        });
-                    }
+                        }
+                    });
+                }).addOnFailureListener((exception) -> {
+                    Log.e("Place Details", "Error getting place details", exception);
+                });
+            }
         }).addOnFailureListener((exception) -> {
             Log.e("Place Details", "Error getting place details", exception);
         });
-}
+    }
 
-private void stopDirectionsThread(){
-if(directionsThread!=null&& directionsThread.isAlive()){
-    directionsThread.interrupt();
-}
-}
-    private void getDirections(LatLng origin, LatLng destination){
-       directionsThread = new Thread(() -> {
+    private void stopDirectionsThread() {
+        if (directionsThread != null && directionsThread.isAlive()) {
+            directionsThread.interrupt();
+        }
+    }
+
+    private void getDirections(LatLng origin, LatLng destination) {
+        directionsThread = new Thread(() -> {
             GeoApiContext context = new GeoApiContext.Builder()
-                    .apiKey("AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8")
+                    .apiKey(String.valueOf(R.string.google_maps_key))
                     .build();
             DirectionsApiRequest request = DirectionsApi.getDirections(context,
                     String.format("%f,%f", origin.latitude, origin.longitude),
@@ -433,11 +462,11 @@ if(directionsThread!=null&& directionsThread.isAlive()){
                 e.printStackTrace();
             }
         });
-       directionsThread.start();
+        directionsThread.start();
 
 /*
         GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey("AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8")
+                .apiKey(String.valueOf(R.string.google_maps_key))
                 .build();
         DirectionsApiRequest request = DirectionsApi.getDirections(context,
                 String.format("%f,%f", origin.latitude, origin.longitude),
@@ -455,7 +484,7 @@ if(directionsThread!=null&& directionsThread.isAlive()){
     }
 
     private void drawRouteOnMap(DirectionsRoute route) {
-      List<LatLng> path = new ArrayList<>();
+        List<LatLng> path = new ArrayList<>();
 
         for (DirectionsLeg leg : route.legs) {
             for (DirectionsStep step : leg.steps) {
@@ -466,13 +495,13 @@ if(directionsThread!=null&& directionsThread.isAlive()){
                 }
             }
         }
-        if(currentPolyLine==null){
-           // currentPolyLine.remove();
+        if (currentPolyLine == null) {
+            // currentPolyLine.remove();
             currentPolyLine = mMap.addPolyline(new PolylineOptions()
                     .addAll(path)
                     .color(Color.GREEN)
                     .width(25));
-        }else{
+        } else {
             currentPolyLine.setPoints(path);
         }
 
@@ -508,26 +537,66 @@ if(directionsThread!=null&& directionsThread.isAlive()){
 
                     return;
                 }
-
                 mMap.setMyLocationEnabled(true);
+
                 startLocationUpdates();
             } else {
                 // Permission denied
-                Toast.makeText(getApplicationContext(),"Location Permission Access must be enabled!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Location Permission Access must be enabled!", Toast.LENGTH_LONG).show();
                 // You might want to show a message to the user or handle this case differently
             }
         }
     }
 
     private List<Marker> Placemarkers = new ArrayList<>();
-    private void clearMarkers(){
-        for (Marker marker: Placemarkers){
+
+    private void clearMarkers() {
+        for (Marker marker : Placemarkers) {
             marker.remove();
         }
         Placemarkers.clear();
     }
+
+    private void startRouteTrackingUser(){
+            PolylineOptions rOptions = new PolylineOptions()
+                    .addAll(routePoints)
+                    .color(Color.GREEN)
+                    .width(20);
+            Polyline rPolyline = mMap.addPolyline(rOptions);
+                routePolyline.add(rPolyline);
+
+        }
+    private void saveRouteToDatabaseWithDialog(){
+        AlertDialog.Builder Abuilder = new AlertDialog.Builder(this);
+        Abuilder.setTitle("Save Route");
+        Abuilder.setMessage("Do you want to save the route?");
+
+        Abuilder.setPositiveButton("Save", (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+            DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
+            String routeId = routesref.push().getKey();
+            routesref.child(routeId).child("points").setValue(routePoints);
+            Toast.makeText(this,"Route saved succesfully",Toast.LENGTH_SHORT).show();
+            for (Polyline polyline : routePolyline){
+                polyline.remove();
+            }
+            routePolyline.clear();
+            routePoints.clear();
+        });
+        Abuilder.setNegativeButton("Cancel", (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+            for (Polyline polyline : routePolyline){
+                polyline.remove();
+            }
+            routePolyline.clear();
+            routePoints.clear();
+        });
+        AlertDialog dialog = Abuilder.create();
+        dialog.show();
+    }
+
     private boolean shouldAutoCenterCamera = true;
-    private LocationUploadHelper locationUploadHelper;
+    private boolean startRoutePoints = false;
     private Location prevDestinationLocatiom;
 
     private void startLocationUpdates() {
@@ -536,73 +605,80 @@ if(directionsThread!=null&& directionsThread.isAlive()){
             @Override
             public void onLocationResult(LocationResult locationResult) {
 
-                    Location location = locationResult.getLastLocation();
-                    if(location!=null){
-                        Location smoothLocate = smoothLocationUpdate(location);
-                        prevLocation=new Location(smoothLocate);
-                        if(prevDestinationLocatiom==null){
-                            prevDestinationLocatiom=location;
-                        }
-                        double latit = smoothLocate.getLatitude();
-                        double longit = smoothLocate.getLongitude();
-                        LatLng userL = new LatLng(latit,longit);
+                Location location = locationResult.getLastLocation();
+                if (location != null) {
+                  //  Location smoothLocate = smoothLocationUpdate(location);
+                    prevLocation = new Location(location);
+                    if (prevDestinationLocatiom == null) {
+                        prevDestinationLocatiom = location;
+                    }
+                    double latit = location.getLatitude();
+                    double longit = location.getLongitude();
+                    LatLng userL = new LatLng(latit, longit);
 
-                        locationUploadHelper.startLocationUpload(user,location);
 
-                        float speed= location.getSpeed();
-                        String formatspeedTxt = String.format("%.1f",speed);
-                        String speedtext = formatspeedTxt + " m/s";
-                        text_Speed.setText(speedtext);
 
-                        if (shouldAutoCenterCamera) {
+                    float speed = location.getSpeed();
+                    // if using a emulator it is bugged
+                    String formatspeedTxt = String.format("%.1f", speed);
+                    String speedtext = formatspeedTxt + " m/s";
+                    text_Speed.setText(speedtext);
 
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userL,17));
-                            shouldAutoCenterCamera = false;
-                        }
+                    if(startRoutePoints==true){
+                        routePoints.add(userL);
+                        startRouteTrackingUser();
+                    }
 
-                        if(destination_enabled && isDestination_canceled==false){
-                            float heading = location.getBearing();
-                            // Set the camera position with updated bearing
-                            CameraPosition cameraPosition = new CameraPosition.Builder()
-                                    .target(userL) // Keep the same target position
-                                    .zoom(20) // Keep the same zoom level
-                                    .bearing(heading) // Set the updated bearing
-                                    .tilt(50) // Reset the tilt to 0 degrees
-                                    .build();
-                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                            mMap.getUiSettings().setAllGesturesEnabled(false);
-                            mMap.getUiSettings().setRotateGesturesEnabled(true);
-                        }
-                        float distance = prevDestinationLocatiom.distanceTo(location);
-                        if(distance >=4 && isDestination_canceled==false && destination_enabled==true){
-                            prevDestinationLocatiom=location;
-                            if(destinationLocation!=null){
-                                getDirections(userL,destinationLocation);
-                            }
-                        }
-                        if(destinationLocation!=null){
-                            float[] results = new float[1];
-                            Location.distanceBetween(
-                                    userL.latitude, userL.longitude,
-                                    destinationLocation.latitude, destinationLocation.longitude,
-                                    results);
-                            float distanceInMeters = results[0];
-                            if(distanceInMeters<20){
-                                clearMarkers();
-                                layoutDestination.setVisibility(View.GONE);
-                                sViewB.setVisibility(View.VISIBLE);
-                                layoutD_userDataF.setVisibility(View.GONE);
-                                stopDirections();
-                            }
+                    if (shouldAutoCenterCamera) {
+
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userL, 17));
+                        shouldAutoCenterCamera = false;
+                    }
+
+                    if (destination_enabled && isDestination_canceled == false) {
+                        float heading = location.getBearing();
+                        // Set the camera position with updated bearing
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(userL) // Keep the same target position
+                                .zoom(20) // Keep the same zoom level
+                                .bearing(heading) // Set the updated bearing
+                                .tilt(50) // Reset the tilt to 0 degrees
+                                .build();
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                        mMap.getUiSettings().setAllGesturesEnabled(false);
+                        mMap.getUiSettings().setRotateGesturesEnabled(true);
+                    }
+                    float distance = prevDestinationLocatiom.distanceTo(location);
+                    if (distance >= 4 && isDestination_canceled == false && destination_enabled == true) {
+                        prevDestinationLocatiom = location;
+                        if (destinationLocation != null) {
+                            getDirections(userL, destinationLocation);
                         }
                     }
+                    if (destinationLocation != null) {
+                        float[] results = new float[1];
+                        Location.distanceBetween(
+                                userL.latitude, userL.longitude,
+                                destinationLocation.latitude, destinationLocation.longitude,
+                                results);
+                        float distanceInMeters = results[0];
+                        if (distanceInMeters < 20) {
+                            clearMarkers();
+                            layoutDestination.setVisibility(View.GONE);
+                            sViewB.setVisibility(View.VISIBLE);
+                            layoutD_startRouting2.setVisibility(View.GONE);
+                            stopDirections();
+                        }
+                    }
+                }
             }
 
         };
 
         LocationRequest locationRequest = new LocationRequest.Builder
-                (Priority.PRIORITY_BALANCED_POWER_ACCURACY,1000)
+                (Priority.PRIORITY_BALANCED_POWER_ACCURACY, 1000)
                 .build();
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -618,14 +694,15 @@ if(directionsThread!=null&& directionsThread.isAlive()){
     }
 
 
-    private void stopDirections(){
+    private void stopDirections() {
         stopDirectionsThread();
-        if(currentPolyLine!=null){
+
+        if (currentPolyLine != null) {
             currentPolyLine.remove();
-            currentPolyLine=null;
+            currentPolyLine = null;
         }
-        destination_enabled=false;
-        isDestination_canceled=true;
+        destination_enabled = false;
+        isDestination_canceled = true;
         timerService.resetTimer();
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(mMap.getCameraPosition().target) // Keep the same target position
@@ -634,7 +711,7 @@ if(directionsThread!=null&& directionsThread.isAlive()){
                 .tilt(0) // Reset the tilt to 0 degrees
                 .build();
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        layoutD_userDataF.setVisibility(View.GONE);
+        layoutD_startRouting2.setVisibility(View.GONE);
         mMap.getUiSettings().setAllGesturesEnabled(true);
     }
 
@@ -684,14 +761,11 @@ if(directionsThread!=null&& directionsThread.isAlive()){
 
                 fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                 fusedLocationClient.getLastLocation().addOnSuccessListener(this,
-                        new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 18));
+                        location -> {
+                            if (location != null) {
+                                LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 17));
 
-                                }
                             }
                         });
             }else{
@@ -710,8 +784,8 @@ if(directionsThread!=null&& directionsThread.isAlive()){
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                     if(userSnapshot.getKey().equals(currentUserId)){
-                         continue;
+                    if(userSnapshot.getKey().equals(currentUserId)){
+                    continue;
                        }
                     for (Marker marker : otherUsersMarkers) {
                         marker.remove();

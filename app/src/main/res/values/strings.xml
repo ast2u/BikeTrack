@@ -5,5 +5,7 @@
     <string name="navigation_drawer_open">Open Navigation drawer</string>
     <string name="navigation_drawer_close">Close Navigation drawer</string>
     <string name="title_activity_maps_main">MapsMainActivity</string>
+    <string name="google_maps_key">AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8</string>
+
 
 </resources>

@@ -180,134 +180,152 @@ tools:context=".MapsSampleActivity" >
 
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:id="@+id/layoutstart_routing"
-        android:background="@drawable/custom_box2"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="400dp"
-        android:layout_marginEnd="10dp"
-        android:visibility="gone"
-        android:layout_marginStart="10dp"
-        android:padding="14dp"
-        android:layout_gravity="center">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView1"
-            android:drawableLeft="@drawable/baseline_circle_24"
-            android:drawablePadding="4dp"
-            android:padding="5dp"
-            android:layout_marginBottom="10dp"
-            android:textColor="#21F429"
-            android:text="Recording"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:layout_below="@id/textView1"
-            android:background="@drawable/layoutbox_black"
-            android:id="@+id/layout_userDataF">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/D_speed_text"
-            android:maxLines="1"
-            android:padding="10dp"
-            android:layout_margin="10dp"
-            android:textColor="@color/white"
-            android:text="9.0 m/s"
-            android:textSize="20sp"/>
-
-            <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/D_time_text"
-            android:maxLines="1"
-            android:layout_margin="10dp"
-            android:textSize="20sp"
-            android:textColor="@color/white"
-            android:padding="10dp"
-            android:text="00:00"/>
-
-            <TextView
-                android:id="@+id/D_distance_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:maxLines="1"
-                android:padding="10dp"
-                android:text="100 m"
-
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-        </LinearLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/greendark"
-            android:layout_marginTop="13dp"
-            android:layout_below="@id/layout_userDataF"
-            android:id="@+id/divider_ButtonAndText"
-            />
-
-        <Button
-            android:id="@+id/DD_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/divider_ButtonAndText"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="12dp"
-            android:textAllCaps="false"
-            android:textSize="20sp"
-            android:textColor="@color/white"
-            android:background="@drawable/rounded_corner1"
-            android:text="End" />
-    </RelativeLayout>
-
-
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="75dp"
-        android:layout_marginLeft="15dp"
+        android:id="@+id/routing_CardView"
         android:layout_gravity="bottom"
-        android:background="@drawable/custom_box2"
-        android:padding="8dp"
-        app:maxImageSize="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="20dp"
+        android:layout_marginBottom="95dp"
         >
+        <RelativeLayout
+            android:padding="10dp"
+            android:id="@+id/layoutstart_routingButton"
+            android:layout_width="wrap_content"
+            android:background="@drawable/custom_box2"
+            android:layout_height="wrap_content">
         <ImageView
             android:layout_width="25dp"
             android:layout_height="25dp"
+            android:id="@+id/icon_cyclingRecordStart1"
             android:src="@drawable/cyclingstartblack"
-            android:id="@+id/icon_cyclingRecordStart"
             android:tint="@color/white"
             tools:ignore="UseAppTint" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Record"
-            android:textSize="17sp"
-            android:layout_toRightOf="@id/icon_cyclingRecordStart"
-            android:padding="3dp"
-            android:id="@+id/text_record"
-            android:textColor="@color/white"
-            app:layout_anchorGravity="center"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/text_record"
-            android:textAllCaps="false"
-            android:backgroundTint="@color/quantum_googblue"
-            android:id="@+id/start_RouteTracking"
-            android:text="Start"
-            />
 
-    </RelativeLayout>
-<com.google.android.material.bottomappbar.BottomAppBar
+        <TextView
+            android:id="@+id/text_record1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/icon_cyclingRecordStart1"
+            android:padding="3dp"
+            android:text="Record"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            app:layout_anchorGravity="center" />
+
+        <Button
+            android:id="@+id/start_RouteTrackingBT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_record1"
+            android:backgroundTint="@color/quantum_googblue"
+            android:text="Start"
+            android:textAllCaps="false" />
+
+            <RelativeLayout
+                android:id="@+id/layoutstart_routing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/custom_box2"
+                android:padding="5dp"
+                android:visibility="gone">
+                <ImageView
+                    android:id="@+id/icon_cyclingRecordStart2"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/cyclingstartblack"
+                    android:tint="#5ced73"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:id="@+id/text_record2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/icon_cyclingRecordStart2"
+                    android:padding="3dp"
+                    android:text="Recording"
+                    android:textColor="#5ced73"
+                    android:textSize="17sp"
+                    app:layout_anchorGravity="center" />
+
+                <LinearLayout
+                    android:id="@+id/layout_userDataF"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@id/text_record2"
+                    android:background="@drawable/layoutbox_black"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/D_speed_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:maxLines="1"
+                        android:padding="10dp"
+                        android:text="9.0 m/s"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/D_time_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:maxLines="1"
+                        android:padding="10dp"
+                        android:text="00:00"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/D_distance_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:maxLines="1"
+                        android:padding="10dp"
+                        android:text="100 m"
+
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider_ButtonAndText"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_below="@id/layout_userDataF"
+                    android:layout_marginTop="13dp"
+                    android:background="@color/greendark" />
+
+                <Button
+                    android:id="@+id/DD_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/divider_ButtonAndText"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/rounded_corner1"
+                    android:text="End"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+
+    <com.google.android.material.bottomappbar.BottomAppBar
     android:id="@+id/bottomAppBar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
