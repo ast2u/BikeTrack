@@ -1,12 +1,9 @@
 package com.example.biketrackcba;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -19,6 +16,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -28,25 +27,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class LocationUpdaterFirebase {
-    private static final long UPDATE_INTERVAL = 10000; // 5 minutes
-    //30*60*1000 = 30mins
-    //10*60*1000 = 10mins
-
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationCallback locationCallback;
+public class SosAlertSignal {
+    private FusedLocationProviderClient fusedLocationProviderClient;
     private FirebaseUser user;
+    private LocationCallback locationCallback;
 
+    private static final long UPDATE_INTERVAL = 5000;
 
-    public LocationUpdaterFirebase(Context context) {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+    public SosAlertSignal(Context context) {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         user = FirebaseAuth.getInstance().getCurrentUser();
         createLocationCallback();
         startLocationFirebaseUpdates(context);
 
     }
-
-
     private void createLocationCallback() {
         locationCallback = new LocationCallback() {
             @Override
@@ -59,12 +53,11 @@ public class LocationUpdaterFirebase {
                     String userId = user.getUid();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
                     String currentDate = dateFormat.format(new Date());
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("BikersAvailable").child(userId);
-                    DatabaseReference rtRef = ref.child("RT_Location");
-                    GeoFire geoFire = new GeoFire(rtRef);
-                    GeoLocation userLocation = new GeoLocation(location.getLatitude(), location.getLongitude());
-                    geoFire.setLocation("UserLocation", userLocation);
-                    rtRef.child("timestamp").setValue(currentDate);
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("SosSignal").child(userId);
+                    ref.child("timestamp").setValue(currentDate);
+                    ref.child("0").setValue(location.getLatitude());
+                    ref.child("1").setValue(location.getLongitude());
+
                 }
             }
         };
@@ -80,11 +73,11 @@ public class LocationUpdaterFirebase {
 
             return;
         }
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
     }
 
     public void stopLocationFirebaseUpdates(){
-        fusedLocationClient.removeLocationUpdates(locationCallback);
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
 }

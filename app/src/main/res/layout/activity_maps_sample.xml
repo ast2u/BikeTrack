@@ -356,7 +356,6 @@ tools:context=".MapsSampleActivity" >
         android:layout_gravity="center"
         android:src="@drawable/sos_button"
         app:fabSize="mini"
-
         android:elevation="1dp"
         app:maxImageSize="45dp"
         app:layout_anchor="@id/bottomAppBar"/>

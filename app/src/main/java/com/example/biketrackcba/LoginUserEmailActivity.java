@@ -392,71 +392,68 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     private void registerUser(String Fname, String email, String username, String bdate, String mobile, String textGender, String password) {
         nAuth = FirebaseAuth.getInstance();
         nAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(LoginUserEmailActivity.this,
-                new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(LoginUserEmailActivity.this,"User Registered successfully",Toast.LENGTH_SHORT).show();
-                    FirebaseUser firebaseUser = nAuth.getCurrentUser();
+                task -> {
+                    if(task.isSuccessful()){
+                        Toast.makeText(LoginUserEmailActivity.this,"User Registered successfully",Toast.LENGTH_SHORT).show();
+                        FirebaseUser firebaseUser = nAuth.getCurrentUser();
 
-                    //update
-                    UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(Fname).build();
-                    firebaseUser.updateProfile(profileChangeRequest);
+                        //update
+                        UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(Fname).build();
+                        firebaseUser.updateProfile(profileChangeRequest);
 
-                    ReadWrite_UserDetails writeUserDetails = new ReadWrite_UserDetails(username,bdate,textGender,mobile);
+                        ReadWrite_UserDetails writeUserDetails = new ReadWrite_UserDetails(username,bdate,textGender,mobile);
 
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
 
-                    reference.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
+                        reference.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
 
-                            if(task.isSuccessful()){
-                                firebaseUser.sendEmailVerification();
+                                if(task.isSuccessful()){
+                                    firebaseUser.sendEmailVerification();
 
-                                Toast.makeText(LoginUserEmailActivity.this,"User Registered successfully. Please verify your Email",
-                                        Toast.LENGTH_LONG).show();
+                                    Toast.makeText(LoginUserEmailActivity.this,"User Registered successfully. Please verify your Email",
+                                            Toast.LENGTH_LONG).show();
 
-                                Intent intent = new Intent(LoginUserEmailActivity.this,UserProfileActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                        | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                                finish();
+                                    Intent intent = new Intent(LoginUserEmailActivity.this,UserProfileActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                            | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                    finish();
 
 
 
-                            }else{
-                                Toast.makeText(LoginUserEmailActivity.this,"User Registered failed. Please try again",
-                                        Toast.LENGTH_LONG).show();
+                                }else{
+                                    Toast.makeText(LoginUserEmailActivity.this,"User Registered failed. Please try again",
+                                            Toast.LENGTH_LONG).show();
 
+                                }
+                                progressBar.setVisibility(View.GONE);
                             }
-                            progressBar.setVisibility(View.GONE);
+                        });
+
+
+
+                    }else{
+                        try{
+                            throw task.getException();
+
+                        }catch (FirebaseAuthWeakPasswordException e){
+                            nrPass.setError("Your password is too weak. Kindly use a mix of alphabets, numbers and special characters.");
+                        nrPass.requestFocus();
+                    }catch(FirebaseAuthInvalidCredentialsException e){
+                        nrPass.setError("Your email is invalid or already in use. Kindly re-enter.");
+                        nrPass.requestFocus();
+                    }catch(FirebaseAuthUserCollisionException e) {
+                            nrEmail.setError("User is already registered with this email. Use another email.");
+                            nrEmail.requestFocus();
+                        }catch (Exception e){
+                            Log.e(TAG,e.getMessage());
+                            Toast.makeText(LoginUserEmailActivity.this,e.getMessage(),Toast.LENGTH_LONG).show();
                         }
-                    });
-
-
-
-                }else{
-                    try{
-                        throw task.getException();
-
-                    }catch (FirebaseAuthWeakPasswordException e){
-                        nrPass.setError("Your password is too weak. Kindly use a mix of alphabets, numbers and special characters.");
-                    nrPass.requestFocus();
-                }catch(FirebaseAuthInvalidCredentialsException e){
-                    nrPass.setError("Your email is invalid or already in use. Kindly re-enter.");
-                    nrPass.requestFocus();
-                }catch(FirebaseAuthUserCollisionException e) {
-                        nrEmail.setError("User is already registered with this email. Use another email.");
-                        nrEmail.requestFocus();
-                    }catch (Exception e){
-                        Log.e(TAG,e.getMessage());
-                        Toast.makeText(LoginUserEmailActivity.this,e.getMessage(),Toast.LENGTH_LONG).show();
-                    }
-                    progressBar.setVisibility(View.GONE);
-                    }
-            }
-        });
+                        progressBar.setVisibility(View.GONE);
+                        }
+                });
 
     }
 

@@ -14,36 +14,42 @@ import com.google.firebase.auth.FirebaseAuth;
 public class Loginstarter extends AppCompatActivity {
 private Button lgEmail, lgGmail;
 private FirebaseAuth nAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lgEmail=findViewById(R.id.loginEmail);
         nAuth=FirebaseAuth.getInstance();
-
-        lgEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if(NetworkUtils.isNetworkAvailable(this)) {
+            lgEmail.setOnClickListener(view -> {
                 Intent intnext = new Intent(Loginstarter.this, LoginUserEmailActivity.class);
                 startActivity(intnext);
                 finish();
-                return;
-            }
-        });
+
+            });
+        }else{
+            lgEmail.setOnClickListener(view -> {
+                NetworkUtils.showNoInternetDialog(this);
+
+            });
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        if(nAuth.getCurrentUser()!=null){
-            Toast.makeText(this, "Already Logged In!", Toast.LENGTH_SHORT).show();
-            //START
-            startActivity(new Intent(Loginstarter.this,UserProfileActivity.class));
-            finish();
+        if(NetworkUtils.isNetworkAvailable(this)) {
+            if (nAuth.getCurrentUser() != null) {
+                Toast.makeText(this, "Already Logged In!", Toast.LENGTH_SHORT).show();
+                //START
+                startActivity(new Intent(Loginstarter.this, UserProfileActivity.class));
+                finish();
+            } else {
+                Toast.makeText(this, "You can login now!", Toast.LENGTH_SHORT).show();
+            }
         }else{
-            Toast.makeText(this, "You can login now!", Toast.LENGTH_SHORT).show();
+            NetworkUtils.showNoInternetDialog(this);
         }
+
     }
 }

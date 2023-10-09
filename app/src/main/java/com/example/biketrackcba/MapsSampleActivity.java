@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -52,6 +53,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 
 import android.os.Bundle;
@@ -62,6 +64,7 @@ import android.os.Looper;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -109,7 +112,7 @@ import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
 
 
-
+import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -135,7 +138,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
     BottomNavigationView bottomNavigationView;
     private SearchView sView;
-    FloatingActionButton sos_button;
+    private FloatingActionButton sos_button;
 
     private PlacesClient placesC;
 
@@ -155,10 +158,13 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private FirebaseUser user;
     private FirebaseDatabase database;
     private TimerService timerService;
-    private DatabaseReference otherUsersRef;
+    private DatabaseReference otherUsersRef,refUserSignal;
     private String currentUserId;
     private LocationUpdaterFirebase locationUpdaterFirebase;
+    private SosAlertSignal sosAlertSignal;
     private List<LatLng> routePoints = new ArrayList<>();
+    private Button startBDialog;
+    private CardView routingCV;
 
 
     @Override
@@ -181,6 +187,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         timerService = new TimerService(new Handler(Looper.getMainLooper()), text_Time);
 
         otherUsersRef = database.getReference("BikersAvailable");
+        refUserSignal = database.getReference("SosSignal");
 
         Places.initialize(getApplicationContext(), "AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8");
         placesC = Places.createClient(this);
@@ -200,6 +207,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         cancel_destin1 = findViewById(R.id.D_cancel);
         cancel_destin2 = findViewById(R.id.DD_cancel);
         text_Location = findViewById(R.id.text_printcLocation);
+        routingCV = findViewById(R.id.routing_CardView);
         suggestionList = new ArrayList<>();
         suggestionAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, suggestionList);
 
@@ -231,7 +239,61 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         menuItem2.setEnabled(false);
         sViewB = findViewById(R.id.mSearch_butt);
         sos_button = findViewById(R.id.start_sosButton);
-        ;
+        sos_button.setOnClickListener(view -> {
+            /*
+            ConstraintLayout constraintLayout = findViewById(R.id.warningConstraintLayout);
+            View vC = LayoutInflater.from(this).inflate(R.layout.warning_dialog,constraintLayout);
+            startBDialog = vC.findViewById(R.id.dialogButtonDone);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setView(vC);
+            final AlertDialog alertDialog = builder.create();
+
+            startBDialog.findViewById(R.id.dialogButtonDone).setOnClickListener(view1 -> {
+                alertDialog.dismiss();
+                Toast.makeText(this,"done",Toast.LENGTH_SHORT).show();
+            });
+            if(alertDialog.getWindow()!=null){
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            }
+            alertDialog.show();
+            */
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("SOS Emergency, Send Help");
+            builder.setMessage("Do you want to start the SOS Signal? " +
+                    "Be reminded that it will set your location publicly at all times.");
+            builder.setPositiveButton("Start", (dialogInterface, i) -> {
+
+               // sosAlertSignal= new SosAlertSignal(this);
+
+                sViewB.setVisibility(View.GONE);
+                centerB.setVisibility(View.GONE);
+                routingCV.setVisibility(View.GONE);
+
+                AlertDialog.Builder secondDialog = new AlertDialog.Builder(this);
+                secondDialog.setTitle("SOS Starting - Sending Help");
+                secondDialog.setMessage("Please don't try to move from your location, "+
+                        "a help is on the way");
+                secondDialog.setPositiveButton("Close", null);
+                AlertDialog dialog2 = secondDialog.create();
+                dialog2.show();
+
+
+            });
+            builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
+
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+
+
+
+
+        });
+
+
         button_StartRTrack.setOnClickListener(view -> {
             startRoutePoints = true;
             toggleroutingLayout();
@@ -256,12 +318,23 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             }
             if(startRoutePoints==true){
                 startRoutePoints=false;
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(mMap.getCameraPosition().target) // Keep the same target position
+                        .zoom(mMap.getCameraPosition().zoom) // Keep the same zoom level
+                        .bearing(mMap.getCameraPosition().bearing) // Keep the same bearing (if needed)
+                        .tilt(0) // Reset the tilt to 0 degrees
+                        .build();
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                 saveRouteToDatabaseWithDialog();
+                mMap.getUiSettings().setAllGesturesEnabled(true);
+
             }
             sViewB.setVisibility(View.VISIBLE);
             timerService.resetTimer();
+
             if (destination_enabled == true && isDestination_canceled == false) {
                 stopDirections();
+
             }
         });
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -405,7 +478,10 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                         @Override
                         public void onSuccess(Location location) {
                             if (location != null) {
-                                Marker mPlaceMarker = mMap.addMarker(new MarkerOptions().position(destinationLocation).title(placeName));
+                                BitmapDescriptor coloredMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+                                Marker mPlaceMarker = mMap.addMarker(new MarkerOptions().position(destinationLocation)
+                                        .icon(coloredMarker)
+                                        .title(placeName));
                                 Placemarkers.add(mPlaceMarker);
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(destinationLocation, 16));
                                 LatLng originLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -627,6 +703,17 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     if(startRoutePoints==true){
                         routePoints.add(userL);
                         startRouteTrackingUser();
+                        float heading = location.getBearing();
+                        // Set the camera position with updated bearing
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(userL) // Keep the same target position
+                                .zoom(20) // Keep the same zoom level
+                                .bearing(heading) // Set the updated bearing
+                                .tilt(50) // Reset the tilt to 0 degrees
+                                .build();
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        mMap.getUiSettings().setAllGesturesEnabled(false);
+                        mMap.getUiSettings().setRotateGesturesEnabled(true);
                     }
 
 
@@ -711,7 +798,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 .tilt(0) // Reset the tilt to 0 degrees
                 .build();
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        layoutD_startRouting2.setVisibility(View.GONE);
         mMap.getUiSettings().setAllGesturesEnabled(true);
     }
 
@@ -816,7 +902,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                         .title(username)
                                 .icon(icon);
                                 Marker marker = mMap.addMarker(markerOptions);
-
                                 marker.setTag(marker);
 
                                 otherUsersMarkers.add(marker);
@@ -835,6 +920,60 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         });
         });
     }
+
+    private List<Marker> otherUserSignalMarker = new ArrayList<>();
+    private void drawSignalMarker(){
+        CompletableFuture.runAsync(()->{
+            refUserSignal.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataS) {
+                    for (DataSnapshot userS : dataS.getChildren()) {
+                        for (Marker marker : otherUserSignalMarker) {
+                            marker.remove();
+                        }
+                        otherUserSignalMarker.clear();
+                        // Assuming each user node has 'latitude' and 'longitude' keys
+                        double latitude = userS.child("0").getValue(Double.class);
+                        double longitude = userS.child("1").getValue(Double.class);
+                        String dateSD = userS.child("timestamp").getValue(String.class);
+
+                        // Create a LatLng object from the retrieved coordinates
+                        LatLng userLocate = new LatLng(latitude, longitude);
+
+                        String userId = userS.getKey();
+
+                        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Registered Users").child(userId);
+
+                        usersRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot datasnaps) {
+
+                                String username = datasnaps.child("username").getValue(String.class);
+
+                                MarkerOptions markerOptions = new MarkerOptions()
+                                        .position(userLocate)
+                                        .title(username)
+                                        .snippet(dateSD);
+                                Marker marker = mMap.addMarker(markerOptions);
+                                marker.setTag(marker);
+
+                                otherUserSignalMarker.add(marker);
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.e(TAG, "Failed to retrieve other users' locations", error.toException());
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e(TAG, "Failed to retrieve other users' locations", error.toException());
+                }
+            });
+        });
+    }
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -843,7 +982,10 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+            //drawSignalMarker();
             drawOtherUsersMarker();
+
 
             mMap.setOnCameraMoveListener(() -> {
                 float zoomLevel = mMap.getCameraPosition().zoom;
