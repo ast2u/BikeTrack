@@ -28,12 +28,7 @@ public class LocationUtils {
                             activity.startActivityForResult(intent, PERMISSION_REQUEST_ENABLE_GPS);
                         }
                     })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
             AlertDialog dialog = builder.create();
             dialog.show();
         }

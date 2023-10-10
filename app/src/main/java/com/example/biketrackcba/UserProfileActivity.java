@@ -1,5 +1,7 @@
 package com.example.biketrackcba;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,11 +9,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 
 import android.content.Intent;
+
+
 import android.os.Bundle;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,6 +43,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private ImageView imageRefresh;
 
 
+
     private BottomNavigationView bottomNavigationView;
 
     private FirebaseAuth nAuthprof;
@@ -50,6 +58,7 @@ public class UserProfileActivity extends AppCompatActivity {
         textVEmail = findViewById(R.id.icd_emailprofile);
         textVbdate = findViewById(R.id.icd_bdateprofile);
         textVgender = findViewById(R.id.icd_genderprofile);
+
         textVmobile = findViewById(R.id.icd_mobileprofile);
 
         //hook
@@ -60,54 +69,48 @@ public class UserProfileActivity extends AppCompatActivity {
         MenuItem menuItem2 = menu.getItem(2);
         menuItem2.setEnabled(false);
 
-        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
 
-                int id = item.getItemId();
-                if (id==R.id.miHome){
-                    Intent intent = new Intent(UserProfileActivity.this, MapsSampleActivity.class);
-                    startActivity(intent);
-                    finish();
+            int id = item.getItemId();
+            if (id==R.id.miHome){
+                Intent intent = new Intent(UserProfileActivity.this, MapsSampleActivity.class);
+                startActivity(intent);
+                finish();
 
 
-                } else if (id==R.id.miSocials) {
-                    Intent intent = new Intent(UserProfileActivity.this, UserSocialsActivity.class);
-                    startActivity(intent);
-                    finish();
+            } else if (id==R.id.miSocials) {
+                Intent intent = new Intent(UserProfileActivity.this, UserSocialsActivity.class);
+                startActivity(intent);
+                finish();
 
-                } else if (id==R.id.miDiscover) {
-                    Intent intent = new Intent(UserProfileActivity.this, DiscoverUserActivity.class);
-                    startActivity(intent);
-                    finish();
+            } else if (id==R.id.miDiscover) {
+                Intent intent = new Intent(UserProfileActivity.this, DiscoverUserActivity.class);
+                startActivity(intent);
+                finish();
 
-                } else if (id==R.id.miProfile) {
-                    startActivity(getIntent());
-                    finish();
-                    overridePendingTransition(0,0);
+            } else if (id==R.id.miProfile) {
+                startActivity(getIntent());
+                finish();
+                overridePendingTransition(0,0);
 
-                }
-
-                return false;
             }
+
+            return false;
         });
 
 
         // Temporary Logout Button
         tempButtonLogout = findViewById(R.id.logoutbutton);
-        tempButtonLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(UserProfileActivity.this,"Logged Out",Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(UserProfileActivity.this, Loginstarter.class);
+        tempButtonLogout.setOnClickListener(view -> {
+            Toast.makeText(UserProfileActivity.this,"Logged Out",Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(UserProfileActivity.this, Loginstarter.class);
 
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        | Intent.FLAG_ACTIVITY_NEW_TASK);
-                nAuthprof.signOut();
-                startActivity(intent);
-                finish();
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    | Intent.FLAG_ACTIVITY_NEW_TASK);
+            nAuthprof.signOut();
+            startActivity(intent);
+            finish();
 
-            }
         });
 
         //  .....
@@ -128,16 +131,13 @@ public class UserProfileActivity extends AppCompatActivity {
          */
 
 
-        imageRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        imageRefresh.setOnClickListener(view -> {
 
-                Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
-                startActivity(intent);
-                overridePendingTransition(2,2);
+            Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            overridePendingTransition(2,2);
 
 
-            }
         });
 
 
@@ -152,6 +152,7 @@ public class UserProfileActivity extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
             showUserProfile(firebaseUser);
         }
+
 
 
     }

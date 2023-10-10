@@ -305,10 +305,12 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/fab"
+        android:id="@+id/start_sosButton"
+
+        android:src="@drawable/baseline_sos_24"
+        android:elevation="1dp"
         app:maxImageSize="45dp"
-        app:fabSize="mini"
-        android:src="@drawable/sos_button"
+        android:backgroundTint="@color/red"
         app:layout_anchor="@id/bottomAppBar"/>
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -35,13 +35,14 @@
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/sos_button"
-        app:fabSize="mini"
-        app:layout_anchor="@id/bottomAppBar"
-        app:maxImageSize="45dp" />
+        android:id="@+id/start_sosButton"
+        android:src="@drawable/baseline_sos_24"
+        android:elevation="1dp"
+        app:maxImageSize="45dp"
+        android:backgroundTint="@color/red"
+        app:layout_anchor="@id/bottomAppBar"/>
 
         <LinearLayout
             android:layout_width="match_parent"

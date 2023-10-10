@@ -28,34 +28,31 @@ private BottomNavigationView bottomNavigationView;
         searchView.setOnQueryTextListener(this);
 
 
-        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
 
-                int id = item.getItemId();
-                if (id==R.id.miHome){
-                    Intent intent = new Intent(DiscoverUserActivity.this, MapsSampleActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else if (id==R.id.miSocials) {
-                    Intent intent = new Intent(DiscoverUserActivity.this, UserSocialsActivity.class);
-                    startActivity(intent);
-                    finish();
+            int id = item.getItemId();
+            if (id==R.id.miHome){
+                Intent intent = new Intent(DiscoverUserActivity.this, MapsSampleActivity.class);
+                startActivity(intent);
+                finish();
+            } else if (id==R.id.miSocials) {
+                Intent intent = new Intent(DiscoverUserActivity.this, UserSocialsActivity.class);
+                startActivity(intent);
+                finish();
 
-                } else if (id==R.id.miDiscover) {
-                    startActivity(getIntent());
-                    finish();
-                    overridePendingTransition(0,0);
+            } else if (id==R.id.miDiscover) {
+                startActivity(getIntent());
+                finish();
+                overridePendingTransition(0,0);
 
-                } else if (id==R.id.miProfile) {
-                    Intent intent = new Intent(DiscoverUserActivity.this,UserProfileActivity.class);
-                    startActivity(intent);
-                    finish();
+            } else if (id==R.id.miProfile) {
+                Intent intent = new Intent(DiscoverUserActivity.this,UserProfileActivity.class);
+                startActivity(intent);
+                finish();
 
-                }
-
-                return false;
             }
+
+            return false;
         });
     }
 

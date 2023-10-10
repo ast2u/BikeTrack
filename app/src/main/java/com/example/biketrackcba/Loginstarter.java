@@ -42,7 +42,7 @@ private FirebaseAuth nAuth;
             if (nAuth.getCurrentUser() != null) {
                 Toast.makeText(this, "Already Logged In!", Toast.LENGTH_SHORT).show();
                 //START
-                startActivity(new Intent(Loginstarter.this, UserProfileActivity.class));
+                startActivity(new Intent(Loginstarter.this, MapsSampleActivity.class));
                 finish();
             } else {
                 Toast.makeText(this, "You can login now!", Toast.LENGTH_SHORT).show();

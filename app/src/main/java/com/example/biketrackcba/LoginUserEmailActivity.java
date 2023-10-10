@@ -1,21 +1,33 @@
 package com.example.biketrackcba;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.text.HtmlCompat;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -53,6 +65,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     private ProgressBar progressBar1, progressBar;
     private static final String TAG = "RegisterLayoutActivity";
     private static final String TAG1 = "LoginLayoutActivity";
+    private CheckBox termCheckbox;
     FirebaseDatabase database;
     DatabaseReference reference;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
@@ -70,6 +83,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         nLogin = findViewById(R.id.nLoginbut);
         progressBar1 = findViewById(R.id.progressBarLogin);
         nAuth = FirebaseAuth.getInstance();
+
         ImageView hidePwdbutton = findViewById(R.id.show_hidepw);
         hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
         hidePwdbutton.setOnClickListener(new View.OnClickListener() {
@@ -122,7 +136,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                     Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
                     FirebaseUser firebaseUser = nAuth.getCurrentUser();
                     Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(LoginUserEmailActivity.this,UserProfileActivity.class);
+                    Intent intent = new Intent(LoginUserEmailActivity.this, MapsSampleActivity.class);
                     //Intent intent = new Intent(Intent.ACTION_MAIN);
                     //intent.addCategory(Intent.CATEGORY_APP_EMAIL);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -201,29 +215,26 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 }
             }
         });
-        nLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        nLogin.setOnClickListener(view1 -> {
 
-                String Lemail = nEmail.getText().toString();
-                String Lpwd = nPass.getText().toString();
+            String Lemail = nEmail.getText().toString();
+            String Lpwd = nPass.getText().toString();
 
-                if (TextUtils.isEmpty(Lemail)) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Email", Toast.LENGTH_SHORT).show();
-                    nEmail.setError("Email is required");
-                    nEmail.requestFocus();
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(Lemail).matches()) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please re-enter your Email", Toast.LENGTH_SHORT).show();
-                    nEmail.setError("Valid Email is required");
-                    nEmail.requestFocus();
-                } else if (TextUtils.isEmpty(Lpwd)) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Password", Toast.LENGTH_SHORT).show();
-                    nEmail.setError("Password is required");
-                    nEmail.requestFocus();
-                } else {
-                    progressBar1.setVisibility(View.VISIBLE);
-                    loginUser(Lemail, Lpwd);
-                }
+            if (TextUtils.isEmpty(Lemail)) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your Email", Toast.LENGTH_SHORT).show();
+                nEmail.setError("Email is required");
+                nEmail.requestFocus();
+            } else if (!Patterns.EMAIL_ADDRESS.matcher(Lemail).matches()) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please re-enter your Email", Toast.LENGTH_SHORT).show();
+                nEmail.setError("Valid Email is required");
+                nEmail.requestFocus();
+            } else if (TextUtils.isEmpty(Lpwd)) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your Password", Toast.LENGTH_SHORT).show();
+                nEmail.setError("Password is required");
+                nEmail.requestFocus();
+            } else {
+                progressBar1.setVisibility(View.VISIBLE);
+                loginUser(Lemail, Lpwd);
             }
         });
 
@@ -240,7 +251,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
             startActivity(new Intent(LoginUserEmailActivity.this,UserProfileActivity.class));
             finish();
         }else{
-            Toast.makeText(this, "You can login now!", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,"User Pass");
         }
     }
 
@@ -248,7 +259,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     public void registerlayoutbutton(View view){
         setContentView(R.layout.activity_register_user);
 
-
+        termCheckbox=findViewById(R.id.termsCheckBox);
         nrName=findViewById(R.id.idname);
         nrEmail=findViewById(R.id.idemailregis);
         nrUsername=findViewById(R.id.idusername);
@@ -265,127 +276,165 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         nRegister=findViewById(R.id.nRegisterbut);
         progressBar = findViewById(R.id.progressBar);
 
-        nRegister.setOnClickListener(new View.OnClickListener() {
+
+
+        SpannableString spannableString = new SpannableString(termCheckbox.getText());
+        ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
-            public void onClick(View view) {
-
-                int selectedGenderId = radioGroupRegisterGender.getCheckedRadioButtonId();
-                radioButtonRegisterGenderSelected = findViewById(selectedGenderId);
-
-                String name = nrName.getText().toString();
-                String email = nrEmail.getText().toString();
-                String username = nrUsername.getText().toString();
-                String bdate = nrBdate.getText().toString();
-                String mobile = nrMobile.getText().toString();
-                String textGender;
-                String password = nrPass.getText().toString();
-
-                String mobileRegex = "[0][0-9]{9}"; //First no. will be 0 to 11 digits
-                Matcher mobileMatcher;
-                Pattern mobilePattern = Pattern.compile(mobileRegex);
-                mobileMatcher = mobilePattern.matcher(mobile);
-
-                if (TextUtils.isEmpty(name)) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Full Name", Toast.LENGTH_LONG).show();
-                    nrName.setError("Full Name is Required");
-                    nrName.requestFocus();
-                } else if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Email Address", Toast.LENGTH_LONG).show();
-                    nrEmail.setError("Email is Required");
-                    nrEmail.requestFocus();
-                } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please re-enter your Email Address", Toast.LENGTH_LONG).show();
-                    nrEmail.setError("Valid email is Required");
-                    nrEmail.requestFocus();
-                } else if (TextUtils.isEmpty(username)) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Username", Toast.LENGTH_LONG).show();
-                    nrUsername.setError("Username is Required");
-                    nrUsername.requestFocus();
-                } else if (TextUtils.isEmpty(bdate)) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Birthdate", Toast.LENGTH_LONG).show();
-                    nrBdate.setError("Birthdate is Required");
-                    nrBdate.requestFocus();
-                } else if (TextUtils.isEmpty(mobile)) {
-                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Mobile Number", Toast.LENGTH_LONG).show();
-                    nrMobile.setError("Mobile No. is Required");
-                    nrMobile.requestFocus();
-                }else if(!mobileMatcher.find()){
-                    Toast.makeText(LoginUserEmailActivity.this, "Please enter your Mobile Number", Toast.LENGTH_LONG).show();
-                    nrMobile.setError("Mobile No. is not Valid");
-                    nrMobile.requestFocus();
-                }else if (radioGroupRegisterGender.getCheckedRadioButtonId()== -1) {
-                    Toast.makeText(LoginUserEmailActivity.this,"Please select your Gender",Toast.LENGTH_LONG).show();
-                    radioButtonRegisterGenderSelected.setError("Gender is Required");
-                    radioButtonRegisterGenderSelected.requestFocus();
-                } else if (nrMobile.length()!=11) {
-                    Toast.makeText(LoginUserEmailActivity.this,"Please re-enter your Mobile Number",Toast.LENGTH_LONG).show();
-                    nrMobile.setError("Mobile No. should be 11 digits");
-                    nrMobile.requestFocus();
-                } else if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(LoginUserEmailActivity.this,"Please enter your Password",Toast.LENGTH_LONG).show();
-                    radioButtonRegisterGenderSelected.setError("Password is Required");
-                    radioButtonRegisterGenderSelected.requestFocus();
-                } else if (password.length()<6) {
-                    Toast.makeText(LoginUserEmailActivity.this,"Password should be at least 6 digits",Toast.LENGTH_LONG).show();
-                    radioButtonRegisterGenderSelected.setError("Password too short");
-                    radioButtonRegisterGenderSelected.requestFocus();
-
-                }else {
-                    textGender = radioButtonRegisterGenderSelected.getText().toString();
-                    progressBar.setVisibility(View.VISIBLE);
-                    registerUser(name,email,username,bdate,mobile,textGender,password);
-                }
-
+            public void onClick(@NonNull View view) {
+                Log.d(TAG,"i am clickable");
+                showCustomDialogTerms();
             }
-        });
-                /**
-                database = FirebaseDatabase.getInstance();
 
-                reference= database.getReference("Users");
-                String name = nrName.getText().toString();
-                String email = nrEmail.getText().toString();
-                String username = nrUsername.getText().toString();
-                String password = nrPass.getText().toString();
-                String bdate = datebutton.getText().toString();
-
-                if (name==null&&email==null&&username==null&&password==null){
-                    Toast.makeText(LoginUserEmailActivity.this, "Error Registration, need to provide all details", Toast.LENGTH_SHORT).show();
-                }else {
-                    HelperClass helperClass = new HelperClass(name, email, username, password, bdate);
-                    reference.child(name).setValue(helperClass);
-                    Toast.makeText(LoginUserEmailActivity.this, "You have Registered successfully", Toast.LENGTH_SHORT).show();
-                    Intent regisdone = new Intent(LoginUserEmailActivity.this, MainscreenActivity.class);
-                    startActivity(regisdone);
-                    finish();
-                    return;
-                }
-                **/
-
-        /**
-
-        nRegister.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                final String email = nEmail.getText().toString();
-                final String password = nPass.getText().toString();
-
-                nAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(LoginUserEmailActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(!task.isSuccessful()){
-                            Toast.makeText(LoginUserEmailActivity.this, "Register Error", Toast.LENGTH_SHORT).show();
-                        }else{
-                            String user_id = nAuth.getCurrentUser().getUid();
-                            DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child("Bikers").child(user_id);
-                            current_user_db.setValue(true);
-                        }
-                    }
-                });
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(true);
             }
+        };
+
+        int startIndex = termCheckbox.getText().toString().indexOf("Terms And Conditions");
+        int endIndex = startIndex + "Terms And Conditions".length();
+
+        spannableString.setSpan(clickableSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        termCheckbox.setText(spannableString);
+        termCheckbox.setMovementMethod(LinkMovementMethod.getInstance());
+        termCheckbox.setHighlightColor(Color.TRANSPARENT);
+
+
+
+        nRegister.setOnClickListener(view1 -> {
+
+            int selectedGenderId = radioGroupRegisterGender.getCheckedRadioButtonId();
+            radioButtonRegisterGenderSelected = findViewById(selectedGenderId);
+
+            String name = nrName.getText().toString();
+            String email = nrEmail.getText().toString();
+            String username = nrUsername.getText().toString();
+            String bdate = nrBdate.getText().toString();
+            String mobile = nrMobile.getText().toString();
+            String textGender;
+            String password = nrPass.getText().toString();
+
+            String mobileRegex = "[0][0-9]{9}"; //First no. will be 0 to 11 digits
+            Matcher mobileMatcher;
+            Pattern mobilePattern = Pattern.compile(mobileRegex);
+            mobileMatcher = mobilePattern.matcher(mobile);
+
+            if (TextUtils.isEmpty(name)) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your First Name and Last Name", Toast.LENGTH_LONG).show();
+                nrName.setError("Name is Required");
+                nrName.requestFocus();
+            } else if (!name.matches("[a-zA-Z]+")) {
+                Toast.makeText(LoginUserEmailActivity.this, "Your name should have no numbers", Toast.LENGTH_LONG).show();
+                nrName.setError("No number in Name");
+                nrName.requestFocus();
+            } else if (TextUtils.isEmpty(email)) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your Email Address", Toast.LENGTH_LONG).show();
+                nrEmail.setError("Email is Required");
+                nrEmail.requestFocus();
+            } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please re-enter your Email Address", Toast.LENGTH_LONG).show();
+                nrEmail.setError("Valid email is Required");
+                nrEmail.requestFocus();
+            } else if (TextUtils.isEmpty(username)) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your Username", Toast.LENGTH_LONG).show();
+                nrUsername.setError("Username is Required");
+                nrUsername.requestFocus();
+            } else if (username.length()<5) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your Username", Toast.LENGTH_LONG).show();
+                nrUsername.setError("Username too short");
+                nrUsername.requestFocus();
+            } else if (TextUtils.isEmpty(bdate)) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your Birthdate", Toast.LENGTH_LONG).show();
+                nrBdate.setError("Birthdate is Required");
+                nrBdate.requestFocus();
+            } else if (TextUtils.isEmpty(mobile)) {
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your Mobile Number", Toast.LENGTH_LONG).show();
+                nrMobile.setError("Mobile No. is Required");
+                nrMobile.requestFocus();
+            }else if(!mobileMatcher.find()){
+                Toast.makeText(LoginUserEmailActivity.this, "Please enter your Mobile Number", Toast.LENGTH_LONG).show();
+                nrMobile.setError("Mobile No. is not Valid");
+                nrMobile.requestFocus();
+            }else if (radioGroupRegisterGender.getCheckedRadioButtonId()== -1) {
+                Toast.makeText(LoginUserEmailActivity.this,"Please select your Gender",Toast.LENGTH_LONG).show();
+                radioButtonRegisterGenderSelected.setError("Gender is Required");
+                radioButtonRegisterGenderSelected.requestFocus();
+            } else if (nrMobile.length()!=11) {
+                Toast.makeText(LoginUserEmailActivity.this,"Please re-enter your Mobile Number",Toast.LENGTH_LONG).show();
+                nrMobile.setError("Mobile No. should be 11 digits");
+                nrMobile.requestFocus();
+            } else if (TextUtils.isEmpty(password)) {
+                Toast.makeText(LoginUserEmailActivity.this,"Please enter your Password",Toast.LENGTH_LONG).show();
+               nrPass.setError("Password is Required");
+                nrPass.requestFocus();
+            } else if (password.length()<6) {
+                Toast.makeText(LoginUserEmailActivity.this,"Password should be at least 6 digits",Toast.LENGTH_LONG).show();
+                nrPass.setError("Password too short");
+               nrPass.requestFocus();
+            } else if (!termCheckbox.isChecked()) {
+                Toast.makeText(LoginUserEmailActivity.this,"Read Terms and Conditions",Toast.LENGTH_LONG).show();
+                termCheckbox.setError("Please check and read Terms and Conditions");
+                termCheckbox.requestFocus();
+            } else{
+                textGender = radioButtonRegisterGenderSelected.getText().toString();
+                progressBar.setVisibility(View.VISIBLE);
+                registerUser(name,email,username,bdate,mobile,textGender,password);
+            }
+
         });
+        
+    }
 
+    private TextView textTerm1, textTerm2;
 
-         **/
+    private void showCustomDialogTerms(){
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_dialog_terms);
+        textTerm1 =dialog.findViewById(R.id.startTextTerm);
+        textTerm2= dialog.findViewById(R.id.longTermText);
+        textTerm1.setText("Please carefully read these Terms and Services before using the BikeTrack mobile application. " +
+                "By using this App, you agree to be bound by these Terms.");
+        String formatTextLong = "<h3>Acceptance of Terms</h3> \n" +
+                "<p>By using the App, you agree to comply with and be bound by these Terms. If you do not " +
+                "agree with these Terms, please refrain from using the App.</p> \n" +
+                "<h3>Privacy and Data Collection</h3>\n" +
+                "<p>a. User Data: " +
+                "The App may collect and store certain personal information, including but not limited to your name, " +
+                "age, phone number, email address, location data, and contact information from your device.</p> \n" +
+                "<p>b. Usage Information: " +
+                "The App may collect usage information, such as the features you access and how you interact with the App.</p> \n" +
+                "<p>c. Location Data: " +
+                "To provide certain features, the App may request access to your device's location data. " +
+                "You can choose to deny this access or disable location services in your device settings " +
+                "but the primary features of the application will no longer work.</p> \n" +
+                "<p>d. Public Sharing of location: \n" +
+                "To provide a group ride feature, the application must display " +
+                "your current location to users that you allow to see them.</p> \n" +
+
+                "<h3>Use of Data</h3> \n" +
+                "<p>a. Purpose: " +
+                "We collect and use your data for purposes such as providing and " +
+                "improving the App's services, customizing your experience, and communicating with you.</p>\n" +
+                "<p>b. Third Parties: \n" +
+                "We may share your data with third-party service providers who assist us " +
+                "in operating the App. These service providers are obligated to protect your " +
+                "data and use it only for the purposes specified.</p> \n" +
+
+                " <h3>User Responsibilities</h3> \n" +
+                " <p>a. Accuracy: \n" +
+                " You are responsible for providing accurate and up-to-date information when using the App.</p>\n" +
+                "<p>b. Security: \n" +
+                "Keep your login credentials confidential and do not share them with others. " +
+                "You are responsible for all activities that occur under your account.</p>\n" +
+
+                "<h3>Termination</h3> \n" +
+                "<p>We reserve the right to terminate or suspend your access to the App at our discretion," +
+                "without notice, for any violation of these Terms or for any other reason.</p>";
+        textTerm2.setText(HtmlCompat.fromHtml(formatTextLong, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        dialog.show();
 
     }
 
@@ -421,12 +470,9 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                                     startActivity(intent);
                                     finish();
 
-
-
                                 }else{
                                     Toast.makeText(LoginUserEmailActivity.this,"User Registered failed. Please try again",
                                             Toast.LENGTH_LONG).show();
-
                                 }
                                 progressBar.setVisibility(View.GONE);
                             }
@@ -469,22 +515,19 @@ public class LoginUserEmailActivity extends AppCompatActivity {
 
     private void initDatePicker(){
 
-        nrBdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
+        nrBdate.setOnClickListener(view -> {
+            final Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                datepd = new DatePickerDialog(LoginUserEmailActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
-                        nrBdate.setText(dayOfMonth+"/"+(month+1)+"/"+year);
-                    }
-                },year,month,day);
-                datepd.show();
-            }
+            datepd = new DatePickerDialog(LoginUserEmailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                    nrBdate.setText(dayOfMonth+"/"+(month+1)+"/"+year);
+                }
+            },year,month,day);
+            datepd.show();
         });
 
     }

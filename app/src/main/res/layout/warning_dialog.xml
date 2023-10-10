@@ -9,6 +9,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:id="@+id/layoutDialog"
+        android:padding="15dp"
         android:background="@drawable/custom_dialogbox"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,7 +31,7 @@
             android:id="@+id/textDescDialog"
             android:gravity="center_horizontal"
             android:textSize="15sp"
-            android:text="hello"
+            android:text="Loading..."
             android:layout_marginTop="16dp"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
@@ -41,17 +42,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/dialogButtonDone"
-            android:text="Start"
+            android:text="Continue"
             android:textSize="14sp"
             android:background="@drawable/rounded_corner"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="25dp"
             android:layout_marginStart="40dp"
+
             android:backgroundTint="@color/yellowWarning"
             android:textAllCaps="false"
             android:layout_marginEnd="40dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textDescDialog"
+
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

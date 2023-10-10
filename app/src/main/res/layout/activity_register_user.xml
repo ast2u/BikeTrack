@@ -126,6 +126,7 @@
                 android:layout_marginTop="0dp"
                 android:layout_below="@id/textView_register_gender"
                 android:layout_height="wrap_content"
+                android:padding="5dp"
                 android:orientation="horizontal"
                 android:id="@+id/radio_group_register_gender">
             <RadioButton
@@ -209,16 +210,15 @@
 
                 android:textSize="16sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/textView7"
+            <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="By continuing you agree to our Terms of Service"
+                android:id="@+id/termsCheckBox"
+                android:text="By continuing you agree to our Terms And Conditions"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:textSize="14sp"
-                />
+                android:textSize="14sp"/>
+
 
         </LinearLayout>
 

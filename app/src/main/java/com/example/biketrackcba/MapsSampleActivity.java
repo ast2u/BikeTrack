@@ -77,6 +77,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -126,6 +127,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
+    private ProgressBar progressBar;
     private GoogleMap mMap;
 
     private LatLng destinationLocation;
@@ -145,6 +147,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private LinearLayout layoutSearch;
     private RelativeLayout layoutDestination, layoutD_startRouting2;
     private CardView RcardView;
+    private TextView warningDialogText;
     private ListView suggestionsListView;
     private ArrayAdapter<String> suggestionAdapter;
     private List<String> suggestionList;
@@ -170,18 +173,20 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        progressBar = findViewById(R.id.progressBarMaps);
         setContentView(R.layout.activity_maps_sample);
-        checkLocationPermission();
-        LocationUtils.checkLocationSettings(this);
+
+
         user = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = user.getUid();
         database = FirebaseDatabase.getInstance();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
+
+        checkLocationPermission();
+        LocationUtils.checkLocationSettings(this);
         locationUpdaterFirebase = new LocationUpdaterFirebase(this);
-
-
 
         text_Time = findViewById(R.id.D_time_text);
         timerService = new TimerService(new Handler(Looper.getMainLooper()), text_Time);
@@ -196,6 +201,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         RcardView = findViewById(R.id.routing_CardView);
         layoutD_startRouting2 = findViewById(R.id.layoutstart_routing);
+
 
         layoutDestination = findViewById(R.id.mDestination_starter);
 
@@ -215,6 +221,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         suggestionsListView.setAdapter(suggestionAdapter);
         suggestionsListView.setOnItemClickListener((adapterView, view, pos, id) -> {
             String selectedSuggestion = suggestionList.get(pos);
+            progressBar.setVisibility(View.VISIBLE);
             getPlaceDetails(selectedSuggestion);
             hideSearchView();
             sViewB.setVisibility(View.GONE);
@@ -240,10 +247,13 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         sViewB = findViewById(R.id.mSearch_butt);
         sos_button = findViewById(R.id.start_sosButton);
         sos_button.setOnClickListener(view -> {
-            /*
+
             ConstraintLayout constraintLayout = findViewById(R.id.warningConstraintLayout);
             View vC = LayoutInflater.from(this).inflate(R.layout.warning_dialog,constraintLayout);
             startBDialog = vC.findViewById(R.id.dialogButtonDone);
+            warningDialogText = vC.findViewById(R.id.textDescDialog);
+            warningDialogText.setText("Do you want to start the SOS Signal? "+
+                    "Be reminded that it will set your location publicly at all times.");
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setView(vC);
             final AlertDialog alertDialog = builder.create();
@@ -256,9 +266,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             }
             alertDialog.show();
-            */
 
 
+            /*
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("SOS Emergency, Send Help");
             builder.setMessage("Do you want to start the SOS Signal? " +
@@ -287,9 +297,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             AlertDialog dialog = builder.create();
             dialog.show();
 
-
-
-
+             */
 
         });
 
@@ -478,6 +486,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                         @Override
                         public void onSuccess(Location location) {
                             if (location != null) {
+                                progressBar.setVisibility(View.GONE);
                                 BitmapDescriptor coloredMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
                                 Marker mPlaceMarker = mMap.addMarker(new MarkerOptions().position(destinationLocation)
                                         .icon(coloredMarker)
@@ -488,7 +497,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                 text_Destination.setText(placeName);
                                 layoutDestination.setVisibility(View.VISIBLE);
                                 start_destin1.setOnClickListener(view -> {
-
                                     layoutDestination.setVisibility(View.GONE);
                                     toggleroutingLayout();
                                     getDirections(originLocation, destinationLocation);
@@ -524,7 +532,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private void getDirections(LatLng origin, LatLng destination) {
         directionsThread = new Thread(() -> {
             GeoApiContext context = new GeoApiContext.Builder()
-                    .apiKey(String.valueOf(R.string.google_maps_key))
+                    .apiKey("AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8")
                     .build();
             DirectionsApiRequest request = DirectionsApi.getDirections(context,
                     String.format("%f,%f", origin.latitude, origin.longitude),
@@ -538,6 +546,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 e.printStackTrace();
             }
         });
+
         directionsThread.start();
 
 /*
@@ -586,7 +595,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
     //Check location permission for Maps
     private void checkLocationPermission() {
-
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -596,6 +604,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
             // Permission already granted, start location updates
+
             startLocationUpdates();
         }
     }
@@ -614,7 +623,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     return;
                 }
                 mMap.setMyLocationEnabled(true);
-
                 startLocationUpdates();
             } else {
                 // Permission denied
@@ -676,6 +684,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private Location prevDestinationLocatiom;
 
     private void startLocationUpdates() {
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationCallback = new LocationCallback() {
             @Override
@@ -691,7 +700,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     double latit = location.getLatitude();
                     double longit = location.getLongitude();
                     LatLng userL = new LatLng(latit, longit);
-
 
 
                     float speed = location.getSpeed();
@@ -734,8 +742,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                 .build();
                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                        mMap.getUiSettings().setAllGesturesEnabled(false);
-                        mMap.getUiSettings().setRotateGesturesEnabled(true);
+                     //   mMap.getUiSettings().setAllGesturesEnabled(false);
+                       // mMap.getUiSettings().setRotateGesturesEnabled(true);
                     }
                     float distance = prevDestinationLocatiom.distanceTo(location);
                     if (distance >= 4 && isDestination_canceled == false && destination_enabled == true) {
