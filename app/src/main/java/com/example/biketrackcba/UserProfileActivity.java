@@ -40,7 +40,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Button tempButtonLogout;
     private String usern,fname,Temail,bdate,gender,mobile;
-    private ImageView imageRefresh;
+    //private Button imageRefresh;
 
 
 
@@ -62,7 +62,7 @@ public class UserProfileActivity extends AppCompatActivity {
         textVmobile = findViewById(R.id.icd_mobileprofile);
 
         //hook
-        imageRefresh = findViewById(R.id.idB_settingButton);
+      //  imageRefresh = findViewById(R.id.idB_settingButton);
         bottomNavigationView = findViewById(R.id.bottomNavView);
         Menu menu = bottomNavigationView.getMenu();
         bottomNavigationView.setSelectedItemId(R.id.miProfile);
@@ -131,7 +131,7 @@ public class UserProfileActivity extends AppCompatActivity {
          */
 
 
-        imageRefresh.setOnClickListener(view -> {
+       /* imageRefresh.setOnClickListener(view -> {
 
             Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
             startActivity(intent);
@@ -139,6 +139,8 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
         });
+
+        */
 
 
         nAuthprof = FirebaseAuth.getInstance();

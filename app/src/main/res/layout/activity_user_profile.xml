@@ -6,72 +6,53 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent" >
-
-<ScrollView
+<com.google.android.material.appbar.AppBarLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-    <!--
-    android:fitsSystemWindows="true"
-    android:id="@+id/drawer_layout"
-    -->
-
-<!--
-    <com.google.android.material.navigation.NavigationView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/nav_view"
-        app:headerLayout="@layout/header_menu"
-        app:menu="@menu/common_menu"
-        android:layout_gravity="start"
+    android:background="@color/greenish"
+    android:layout_height="wrap_content">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        app:title="User Profile"
+        app:menu="@menu/top_app_bar"
         />
-
--->
-
-
+</com.google.android.material.appbar.AppBarLayout>
+<androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-
-
         >
-
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#6F826A"
             >
 
-            <!--
-            <androidx.appcompat.widget.Toolbar
-                android:layout_width="wrap_content"
-                android:layout_height="?attr/actionBarSize"
-                android:id="@+id/univ_toolbar"
-                android:elevation="4dp"
-                android:theme="?attr/actionBarTheme"
-                app:navigationIcon="@drawable/baseline_menu_24"
-                />
-
-                -->
-            <ImageView
+         <!--
+            <Button
                 android:id="@+id/idB_settingButton"
-                android:layout_width="50dp"
-                android:layout_height="45dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_alignParentRight="true"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
                 android:clickable="true"
                 android:padding="6dp"
-                android:src="@drawable/baseline_settings_24" />
+                android:background="@drawable/baseline_settings_24"/>
+            -->
 
             <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="230dp"
+                android:layout_height="170dp"
                 android:padding="8dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="5dp"
                 android:id="@+id/defaultprofilepic"
                 android:src="@drawable/userprofilepic"/>
             <TextView
@@ -275,7 +256,7 @@
 
     </LinearLayout>
 
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
