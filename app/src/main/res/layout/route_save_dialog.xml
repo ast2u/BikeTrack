@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="20dp"
+    android:padding="20dp"
+    android:id="@+id/layoutDialogContainer"
+    android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/layoutDialogContainer"
+        android:id="@+id/layoutDialog"
+        android:background="@drawable/custom_dialogbox">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/Vtext_title"
+            android:background="@color/greenWarning"
+            android:textColor="@color/white"
+            android:paddingLeft="15dp"
+            android:text="Save Route"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"/>
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/baseline_save_24"
+            android:id="@+id/imageSaveicon"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/Vtext_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/Vtext_title"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/Vtext_desc"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="40dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/Vtext_title"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:id="@+id/buttonSaveAction"
+        android:layout_marginStart="40dp"
+        android:text="Save"
+
+        android:backgroundTint="@color/greenWarning"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/layoutDialog"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/buttonCancelAction"
+        app:layout_constraintTop_toBottomOf="@id/layoutDialog"
+        android:textSize="15sp"
+        android:textColor="@color/white"/>
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:id="@+id/buttonCancelAction"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="40dp"
+        android:text="Cancel"
+        android:radius="12dp"
+        android:backgroundTint="@color/red"
+        app:layout_constraintBottom_toBottomOf="@id/layoutDialog"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buttonSaveAction"
+        app:layout_constraintTop_toBottomOf="@id/layoutDialog"
+        android:textSize="15sp"
+        android:textColor="@color/white"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

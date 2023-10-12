@@ -355,21 +355,26 @@ tools:context=".MapsSampleActivity" >
 
 
 </com.google.android.material.bottomappbar.BottomAppBar>
-
+    <ProgressBar
+        android:id="@+id/start_sosButtonLoading"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:elevation="7dp"
+        app:layout_anchor="@+id/start_sosButton"
+        android:indeterminateTint="@color/secondary_red"
+        android:visibility="gone"
+        app:layout_anchorGravity="center" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/start_sosButton"
-
         android:src="@drawable/baseline_sos_24"
         android:elevation="1dp"
         app:maxImageSize="45dp"
         android:backgroundTint="@color/red"
-        app:layout_anchor="@id/bottomAppBar"/>
-
-
-
+        app:layout_anchor="@id/bottomAppBar"
+        />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

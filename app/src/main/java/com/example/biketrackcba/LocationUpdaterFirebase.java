@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class LocationUpdaterFirebase {
-    private static final long UPDATE_INTERVAL = 10000; // 5 minutes
+    private static final long UPDATE_INTERVAL = 30000; // 5 minutes
     //30*60*1000 = 30mins
     //10*60*1000 = 10mins
 
@@ -58,19 +58,21 @@ public class LocationUpdaterFirebase {
 
                     String userId = user.getUid();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
+                    Boolean sosSignal = false;
                     String currentDate = dateFormat.format(new Date());
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference("BikersAvailable").child(userId);
                     DatabaseReference rtRef = ref.child("RT_Location");
                     GeoFire geoFire = new GeoFire(rtRef);
                     GeoLocation userLocation = new GeoLocation(location.getLatitude(), location.getLongitude());
                     geoFire.setLocation("UserLocation", userLocation);
+                    rtRef.child("sosAlert").setValue(sosSignal);
                     rtRef.child("timestamp").setValue(currentDate);
                 }
             }
         };
     }
 
-    private void startLocationFirebaseUpdates(Context c) {
+    public void startLocationFirebaseUpdates(Context c) {
         LocationRequest locationRequest = new LocationRequest.Builder(
                 Priority.PRIORITY_BALANCED_POWER_ACCURACY, UPDATE_INTERVAL).build();
 

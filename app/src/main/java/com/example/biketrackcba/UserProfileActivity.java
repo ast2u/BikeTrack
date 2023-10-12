@@ -11,6 +11,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -24,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,12 +36,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserProfileActivity extends AppCompatActivity {
 
     private TextView textVUsern, textVFname, textVEmail,textVbdate, textVgender,textVmobile;
     private ProgressBar progressBar;
     private Button tempButtonLogout;
+    private GoogleMap gMap;
     private String usern,fname,Temail,bdate,gender,mobile;
     //private Button imageRefresh;
 
@@ -212,6 +225,112 @@ public class UserProfileActivity extends AppCompatActivity {
         });
 
 
+    }
+    private void showRoutesDataUser(FirebaseUser user){
+        String userID = user.getUid();
+
+        DatabaseReference routesRef = FirebaseDatabase.getInstance().getReference("Routes");
+
+        routesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot pointSnap : snapshot.getChildren()){
+                    String routeKey = routesRef.push().getKey();
+                    List<LatLng> routePoints = new ArrayList<>();
+                    for (DataSnapshot pointSnapshot : pointSnap.child(routeKey).child("points").getChildren()) {
+                        double latitude = pointSnapshot.child("latitude").getValue(double.class);
+                        double longitude = pointSnapshot.child("longitude").getValue(double.class);
+
+                        LatLng latLng = new LatLng(latitude, longitude); // Create a LatLng object
+                        routePoints.add(latLng); // Add LatLng to the list
+                    }
+                    String titleR = pointSnap.child("title").getValue(String.class);
+                    String descR = pointSnap.child("desc").getValue(String.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+private void generateStaticMapImage(List<LatLng> routePoints,String polyline){
+    String apiKey = "AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8"; // Replace with your own API key
+    List<LatLng> decodedRoutePoints = decodePolyline(polyline);
+    String markers = "markers=";
+    for (LatLng point : routePoints) {
+        markers += point.lat + "," + point.lng + "|";
+    }
+    String staticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?" +
+            "center="+ decodedRoutePoints.get(0).lat + "," + decodedRoutePoints.get(0).lng +
+            "&zoom=13" + // Adjust zoom level as needed
+            "&size=600x300" + // Set desired size
+            "&maptype=roadmap" + // Choose map type
+            "&" + markers +
+            "&path=enc:" + polyline + // Add the encoded polyline
+            "&key=" + apiKey;
+    Picasso.get()
+            .load(staticMapUrl)
+            .into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    saveImageToStorage(bitmap);
+                }
+
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
+}
+
+    private void saveImageToStorage(Bitmap bitmap) {
+        String fileName = "static_map_image.png";
+
+        try (FileOutputStream out = new FileOutputStream(new File(getExternalCacheDir(), fileName))) {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // Save bitmap as PNG
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<LatLng> decodePolyline(String encoded) {
+        List<LatLng> poly = new ArrayList<>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1F) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1F) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            double latitude = lat / 1e5;
+            double longitude = lng / 1e5;
+            poly.add(new LatLng(latitude, longitude));
+        }
+
+        return poly;
     }
 
 

@@ -50,12 +50,16 @@ import android.content.Intent;
 
 import android.content.pm.PackageManager;
 
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -68,6 +72,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
 import android.view.animation.AnimationUtils;
@@ -75,6 +80,7 @@ import android.view.animation.AnimationUtils;
 
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -127,11 +133,12 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
-    private ProgressBar progressBar;
+    private ProgressBar progressBar,sosProgressBar;
     private GoogleMap mMap;
 
     private LatLng destinationLocation;
     private DirectionsResult directionsResult;
+
     private Location prevLocation;
     private Thread directionsThread;
 
@@ -147,7 +154,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private LinearLayout layoutSearch;
     private RelativeLayout layoutDestination, layoutD_startRouting2;
     private CardView RcardView;
-    private TextView warningDialogText;
+
     private ListView suggestionsListView;
     private ArrayAdapter<String> suggestionAdapter;
     private List<String> suggestionList;
@@ -162,20 +169,23 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private FirebaseDatabase database;
     private TimerService timerService;
     private DatabaseReference otherUsersRef,refUserSignal;
+    MediaPlayer sosMediaplayer;
     private String currentUserId;
     private LocationUpdaterFirebase locationUpdaterFirebase;
     private SosAlertSignal sosAlertSignal;
     private List<LatLng> routePoints = new ArrayList<>();
-    private Button startBDialog;
-    private CardView routingCV;
+    private Button startBDialog,continueBDialog,cancelBDialog,startSaveRoute,cancelSaveRoute;
+    private Button finalstartSaveRoute, finalcancelSaveRoute;
+    private EditText title_Route, desc_Route;
+    private TextView saveDialogText;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        progressBar = findViewById(R.id.progressBarMaps);
         setContentView(R.layout.activity_maps_sample);
-
+        progressBar = findViewById(R.id.progressBarMaps);
+        sosProgressBar = findViewById(R.id.start_sosButtonLoading);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = user.getUid();
@@ -187,6 +197,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         checkLocationPermission();
         LocationUtils.checkLocationSettings(this);
         locationUpdaterFirebase = new LocationUpdaterFirebase(this);
+        sosMediaplayer = MediaPlayer.create(this,R.raw.sos_sound);
 
         text_Time = findViewById(R.id.D_time_text);
         timerService = new TimerService(new Handler(Looper.getMainLooper()), text_Time);
@@ -213,7 +224,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         cancel_destin1 = findViewById(R.id.D_cancel);
         cancel_destin2 = findViewById(R.id.DD_cancel);
         text_Location = findViewById(R.id.text_printcLocation);
-        routingCV = findViewById(R.id.routing_CardView);
+
         suggestionList = new ArrayList<>();
         suggestionAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, suggestionList);
 
@@ -222,6 +233,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         suggestionsListView.setOnItemClickListener((adapterView, view, pos, id) -> {
             String selectedSuggestion = suggestionList.get(pos);
             progressBar.setVisibility(View.VISIBLE);
+
             getPlaceDetails(selectedSuggestion);
             hideSearchView();
             sViewB.setVisibility(View.GONE);
@@ -242,66 +254,29 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         bottomNavigationView = findViewById(R.id.bottomNavView);
         Menu menu = bottomNavigationView.getMenu();
         bottomNavigationView.setSelectedItemId(R.id.miHome);
+        MenuItem menuItem = menu.getItem(0);
+        MenuItem menuItem1 = menu.getItem(1);
         MenuItem menuItem2 = menu.getItem(2);
+        MenuItem menuItem3 = menu.getItem(3);
+        MenuItem menuItem4 = menu.getItem(4);
+
         menuItem2.setEnabled(false);
         sViewB = findViewById(R.id.mSearch_butt);
         sos_button = findViewById(R.id.start_sosButton);
+
+
         sos_button.setOnClickListener(view -> {
+            SosStarted();
+            //Temporary
+          //  menuItem.setEnabled(false);
+          //  menuItem1.setEnabled(false);
+          //  menuItem3.setEnabled(false);
+           // menuItem4.setEnabled(false);
 
-            ConstraintLayout constraintLayout = findViewById(R.id.warningConstraintLayout);
-            View vC = LayoutInflater.from(this).inflate(R.layout.warning_dialog,constraintLayout);
-            startBDialog = vC.findViewById(R.id.dialogButtonDone);
-            warningDialogText = vC.findViewById(R.id.textDescDialog);
-            warningDialogText.setText("Do you want to start the SOS Signal? "+
-                    "Be reminded that it will set your location publicly at all times.");
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setView(vC);
-            final AlertDialog alertDialog = builder.create();
+            //
 
-            startBDialog.findViewById(R.id.dialogButtonDone).setOnClickListener(view1 -> {
-                alertDialog.dismiss();
-                Toast.makeText(this,"done",Toast.LENGTH_SHORT).show();
-            });
-            if(alertDialog.getWindow()!=null){
-                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            }
-            alertDialog.show();
-
-
-            /*
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("SOS Emergency, Send Help");
-            builder.setMessage("Do you want to start the SOS Signal? " +
-                    "Be reminded that it will set your location publicly at all times.");
-            builder.setPositiveButton("Start", (dialogInterface, i) -> {
-
-               // sosAlertSignal= new SosAlertSignal(this);
-
-                sViewB.setVisibility(View.GONE);
-                centerB.setVisibility(View.GONE);
-                routingCV.setVisibility(View.GONE);
-
-                AlertDialog.Builder secondDialog = new AlertDialog.Builder(this);
-                secondDialog.setTitle("SOS Starting - Sending Help");
-                secondDialog.setMessage("Please don't try to move from your location, "+
-                        "a help is on the way");
-                secondDialog.setPositiveButton("Close", null);
-                AlertDialog dialog2 = secondDialog.create();
-                dialog2.show();
-
-
-            });
-            builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
-
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-             */
 
         });
-
-
         button_StartRTrack.setOnClickListener(view -> {
             startRoutePoints = true;
             toggleroutingLayout();
@@ -371,7 +346,57 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             }
         });
     }
+    private boolean isSosStarted = false;
+    private void SosStarted (){
+        if(!isSosStarted) {
+            Toast.makeText(this,"You won't be able to navigate to other menu",Toast.LENGTH_LONG).show();
+            sosProgressBar.setVisibility(View.VISIBLE);
+            RcardView.setVisibility(View.GONE);
+            sViewB.setVisibility(View.GONE);
+            ConstraintLayout constraintLayout = findViewById(R.id.warningConstraintLayout);
+            View vC = LayoutInflater.from(this).inflate(R.layout.warning_dialog, constraintLayout);
+            startBDialog = vC.findViewById(R.id.dialogButtonDone);
+            cancelBDialog = vC.findViewById(R.id.dialogButtonCancel);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setView(vC);
+            final AlertDialog alertDialog = builder.create();
 
+            startBDialog.findViewById(R.id.dialogButtonDone).setOnClickListener(view1 -> {
+                alertDialog.dismiss();
+                playSOSsound();
+                locationUpdaterFirebase.stopLocationFirebaseUpdates();
+                sosAlertSignal = new SosAlertSignal(this);
+                ConstraintLayout constraintLayout2 = findViewById(R.id.warningConstraintLayout2);
+                View vC2 = LayoutInflater.from(this).inflate(R.layout.warning_dialog2, constraintLayout2);
+                continueBDialog = vC2.findViewById(R.id.dialogContinueDone);
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+                builder2.setView(vC2);
+                AlertDialog alertDialog2 = builder2.create();
+                continueBDialog.findViewById(R.id.dialogContinueDone).setOnClickListener(view2 -> {
+                    alertDialog2.dismiss();
+                });
+                alertDialog2.show();
+
+            });
+            cancelBDialog.findViewById(R.id.dialogButtonCancel).setOnClickListener(view1 -> {
+                alertDialog.dismiss();
+                sosProgressBar.setVisibility(View.GONE);
+            });
+            if (alertDialog.getWindow() != null) {
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            }
+            alertDialog.show();
+        }else{
+            sosProgressBar.setVisibility(View.GONE);
+            RcardView.setVisibility(View.VISIBLE);
+            sViewB.setVisibility(View.VISIBLE);
+            stopSOSsound();
+            sosAlertSignal.stopSosUpdates();
+            locationUpdaterFirebase.startLocationFirebaseUpdates(this);
+
+        }
+        isSosStarted=!isSosStarted;
+    }
     private void toggleSearchView() {
         if (sView.getVisibility() == View.VISIBLE) {
             hideSearchView();
@@ -406,7 +431,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             Log.d(TAG, "location have stopped");
             fusedLocationClient.removeLocationUpdates(locationCallback);
         }
-        locationUpdaterFirebase.stopLocationFirebaseUpdates();
+
     }
 
     @Override
@@ -427,6 +452,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         super.onDestroy();
         stopLocationUpdates();
     }
+
 
     @Override
     public void onLowMemory() {
@@ -651,6 +677,76 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         }
     private void saveRouteToDatabaseWithDialog(){
+
+        ConstraintLayout constraintLayout = findViewById(R.id.layoutDialogContainer);
+        View vC = LayoutInflater.from(this).inflate(R.layout.route_save_dialog,constraintLayout);
+        startSaveRoute = vC.findViewById(R.id.buttonSaveAction);
+        cancelSaveRoute = vC.findViewById(R.id.buttonCancelAction);
+        saveDialogText = vC.findViewById(R.id.Vtext_desc);
+        saveDialogText.setText("Do you want to save the route?");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(vC);
+        final AlertDialog alertDSave = builder.create();
+        startSaveRoute.findViewById(R.id.buttonSaveAction).setOnClickListener(view1 -> {
+            alertDSave.dismiss();
+            ConstraintLayout ccL = findViewById(R.id.layoutDialogContainer2);
+            View vC2 = LayoutInflater.from(this).inflate(R.layout.route_save_dialog2,ccL);
+            AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+            builder2.setView(vC2);
+            AlertDialog dialog2=builder2.create();
+            dialog2.show();
+            finalstartSaveRoute = vC2.findViewById(R.id.buttonSaveAction2);
+            finalcancelSaveRoute = vC2.findViewById(R.id.buttonCancelAction2);
+            title_Route = vC2.findViewById(R.id.title_edit_Route);
+            desc_Route = vC2.findViewById(R.id.desc_edit_Route);
+            finalstartSaveRoute.findViewById(R.id.buttonSaveAction2).setOnClickListener(view2 ->{
+                dialog2.dismiss();
+                String titleR = title_Route.getText().toString();
+                String descR = desc_Route.getText().toString();
+
+
+                DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
+                String routeId = routesref.push().getKey();
+                routesref.child(routeId).child("points").setValue(routePoints);
+                routesref.child(routeId).child("title").setValue(titleR);
+                routesref.child(routeId).child("desc").setValue(descR);
+                Toast.makeText(this,"Route saved succesfully",Toast.LENGTH_SHORT).show();
+
+                for (Polyline polyline : routePolyline){
+                    polyline.remove();
+                }
+                routePolyline.clear();
+                routePoints.clear();
+
+            });
+
+            finalcancelSaveRoute.findViewById(R.id.buttonCancelAction2).setOnClickListener(view2 ->{
+                dialog2.dismiss();
+                for (Polyline polyline : routePolyline){
+                    polyline.remove();
+                }
+                routePolyline.clear();
+                routePoints.clear();
+            });
+
+
+        });
+
+        cancelSaveRoute.findViewById(R.id.buttonCancelAction).setOnClickListener(view -> {
+            alertDSave.dismiss();
+            for (Polyline polyline : routePolyline){
+                polyline.remove();
+            }
+            routePolyline.clear();
+            routePoints.clear();
+        });
+        if(alertDSave.getWindow()!=null){
+            alertDSave.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        }
+        alertDSave.show();
+
+
+        /*
         AlertDialog.Builder Abuilder = new AlertDialog.Builder(this);
         Abuilder.setTitle("Save Route");
         Abuilder.setMessage("Do you want to save the route?");
@@ -677,6 +773,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         });
         AlertDialog dialog = Abuilder.create();
         dialog.show();
+
+         */
     }
 
     private boolean shouldAutoCenterCamera = true;
@@ -684,8 +782,10 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private Location prevDestinationLocatiom;
 
     private void startLocationUpdates() {
+        progressBar.setVisibility(View.VISIBLE);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -701,6 +801,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     double longit = location.getLongitude();
                     LatLng userL = new LatLng(latit, longit);
 
+                    if(progressBar.getVisibility()==View.VISIBLE) {
+                        progressBar.setVisibility(View.GONE);
+                    }
 
                     float speed = location.getSpeed();
                     // if using a emulator it is bugged
@@ -720,8 +823,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                 .tilt(50) // Reset the tilt to 0 degrees
                                 .build();
                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                        mMap.getUiSettings().setAllGesturesEnabled(false);
-                        mMap.getUiSettings().setRotateGesturesEnabled(true);
+                        //mMap.getUiSettings().setAllGesturesEnabled(false);
+                       // mMap.getUiSettings().setRotateGesturesEnabled(true);
                     }
 
 
@@ -741,7 +844,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                 .tilt(50) // Reset the tilt to 0 degrees
                                 .build();
                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
                      //   mMap.getUiSettings().setAllGesturesEnabled(false);
                        // mMap.getUiSettings().setRotateGesturesEnabled(true);
                     }
@@ -773,7 +875,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         };
 
         LocationRequest locationRequest = new LocationRequest.Builder
-                (Priority.PRIORITY_BALANCED_POWER_ACCURACY, 1000)
+                (Priority.PRIORITY_HIGH_ACCURACY, 1000)
                 .build();
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -872,22 +974,35 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     }
 
     private List<Marker> otherUsersMarkers = new ArrayList<>();
+    private List<Marker> otherUserSignalMarker = new ArrayList<>();
     private void drawOtherUsersMarker(){
         CompletableFuture.runAsync(()->{
         otherUsersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    if(userSnapshot.getKey().equals(currentUserId)){
-                    continue;
-                       }
+
                     for (Marker marker : otherUsersMarkers) {
                         marker.remove();
                     }
                      otherUsersMarkers.clear();
+                    for (Marker marker : otherUserSignalMarker) {
+                        marker.remove();
+                    }
+                    otherUserSignalMarker.clear();
                     // Assuming each user node has 'latitude' and 'longitude' keys
                     double latitude = userSnapshot.child("RT_Location/UserLocation/l/0").getValue(Double.class);
                     double longitude = userSnapshot.child("RT_Location/UserLocation/l/1").getValue(Double.class);
+                    Boolean sosSignal = userSnapshot.child("RT_Location/sosAlert").getValue(Boolean.class);
+                    String timestamp = userSnapshot.child("RT_Location/timestamp").getValue(String.class);
+
+
+                        if (sosSignal == false) {
+                            if (userSnapshot.getKey().equals(currentUserId)) {
+                                continue;
+                            }
+                        }
+
 
                     // Create a LatLng object from the retrieved coordinates
                     LatLng userLocation = new LatLng(latitude, longitude);
@@ -900,19 +1015,31 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                                String username = snapshot.child("username").getValue(String.class);
+                            String username = snapshot.child("username").getValue(String.class);
                             Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.defaultusermarker);
                             Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap,65, 65, true);
-
                             BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap);
+                            
+                            if(sosSignal==false) {
                                 MarkerOptions markerOptions = new MarkerOptions()
                                         .position(userLocation)
                                         .title(username)
-                                .icon(icon);
+                                        .icon(icon);
                                 Marker marker = mMap.addMarker(markerOptions);
                                 marker.setTag(marker);
 
                                 otherUsersMarkers.add(marker);
+                            } else if (sosSignal==true) {
+                                MarkerOptions markerOptions = new MarkerOptions()
+                                        .position(userLocation)
+                                        .title(username)
+                                        .snippet(timestamp)
+                                        .snippet("Need Help!");
+                                Marker marker = mMap.addMarker(markerOptions);
+                                marker.setTag(marker);
+                                
+                                otherUserSignalMarker.add(marker);
+                            }
                         }
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
@@ -929,7 +1056,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         });
     }
 
-    private List<Marker> otherUserSignalMarker = new ArrayList<>();
+    /*
+
     private void drawSignalMarker(){
         CompletableFuture.runAsync(()->{
             refUserSignal.addValueEventListener(new ValueEventListener() {
@@ -982,6 +1110,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         });
     }
 
+     */
+
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -991,7 +1122,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            //drawSignalMarker();
             drawOtherUsersMarker();
 
 
@@ -1011,5 +1141,16 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         }
 
 }
+    public void playSOSsound(){
+        sosMediaplayer.setLooping(true);
+        sosMediaplayer.start();
+    }
+    public void stopSOSsound(){
+        sosMediaplayer.setLooping(false);
+        if (sosMediaplayer.isPlaying()) {
+            sosMediaplayer.stop(); // Stop playing the SOS sound
+            sosMediaplayer.prepareAsync();
+        }
+    }
 
 }

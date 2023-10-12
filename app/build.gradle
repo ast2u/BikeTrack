@@ -47,7 +47,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-auth:22.1.2'
     implementation 'com.google.firebase:firebase-database:20.2.2'
-
+    implementation 'com.squareup.picasso:picasso:2.8'
     implementation 'com.firebase:geofire-android:3.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'

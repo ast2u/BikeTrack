@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.text.method.TextKeyListener;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.util.Patterns;
@@ -178,14 +179,11 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginUserEmailActivity.this);
         builder.setTitle("Email Not Verified");
         builder.setMessage("Please verify your email now. You can not login without email verification");
-        builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_APP_EMAIL);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
+        builder.setPositiveButton("Continue", (dialogInterface, i) -> {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         });
         AlertDialog alertDialog = builder.create();
 
@@ -326,9 +324,13 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 Toast.makeText(LoginUserEmailActivity.this, "Please enter your First Name and Last Name", Toast.LENGTH_LONG).show();
                 nrName.setError("Name is Required");
                 nrName.requestFocus();
-            } else if (!name.matches("[a-zA-Z]+")) {
+            } else if (!name.matches("[a-zA-Z\\s]+")) {
                 Toast.makeText(LoginUserEmailActivity.this, "Your name should have no numbers", Toast.LENGTH_LONG).show();
                 nrName.setError("No number in Name");
+                nrName.requestFocus();
+            } else if (name.length()>23) {
+                Toast.makeText(LoginUserEmailActivity.this, "Shorten your name", Toast.LENGTH_LONG).show();
+                nrName.setError("Name too long");
                 nrName.requestFocus();
             } else if (TextUtils.isEmpty(email)) {
                 Toast.makeText(LoginUserEmailActivity.this, "Please enter your Email Address", Toast.LENGTH_LONG).show();
@@ -381,11 +383,30 @@ public class LoginUserEmailActivity extends AppCompatActivity {
             } else{
                 textGender = radioButtonRegisterGenderSelected.getText().toString();
                 progressBar.setVisibility(View.VISIBLE);
-                registerUser(name,email,username,bdate,mobile,textGender,password);
+                String nameOutput = capitalizeFirstLetter(name);
+                registerUser(nameOutput,email,username,bdate,mobile,textGender,password);
             }
 
         });
+
+
         
+    }
+
+
+    private static String capitalizeFirstLetter(String input){
+        StringBuilder result = new StringBuilder();
+        String[] words = input.split("\\s");
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                char firstChar = Character.toUpperCase(word.charAt(0));
+                String rest = word.substring(1).toLowerCase();
+                result.append(firstChar).append(rest).append(" ");
+            }
+        }
+
+        return result.toString().trim();
     }
 
     private TextView textTerm1, textTerm2;
@@ -438,6 +459,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
 
     }
 
+
     private void registerUser(String Fname, String email, String username, String bdate, String mobile, String textGender, String password) {
         nAuth = FirebaseAuth.getInstance();
         nAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(LoginUserEmailActivity.this,
@@ -454,28 +476,25 @@ public class LoginUserEmailActivity extends AppCompatActivity {
 
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
 
-                        reference.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
+                        reference.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(task1 -> {
 
-                                if(task.isSuccessful()){
-                                    firebaseUser.sendEmailVerification();
+                            if(task1.isSuccessful()){
+                                firebaseUser.sendEmailVerification();
 
-                                    Toast.makeText(LoginUserEmailActivity.this,"User Registered successfully. Please verify your Email",
-                                            Toast.LENGTH_LONG).show();
+                                Toast.makeText(LoginUserEmailActivity.this,"User Registered successfully. Please verify your Email",
+                                        Toast.LENGTH_LONG).show();
 
-                                    Intent intent = new Intent(LoginUserEmailActivity.this,UserProfileActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                            | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
-                                    finish();
+                                Intent intent = new Intent(LoginUserEmailActivity.this,MapsSampleActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                                finish();
 
-                                }else{
-                                    Toast.makeText(LoginUserEmailActivity.this,"User Registered failed. Please try again",
-                                            Toast.LENGTH_LONG).show();
-                                }
-                                progressBar.setVisibility(View.GONE);
+                            }else{
+                                Toast.makeText(LoginUserEmailActivity.this,"User Registered failed. Please try again",
+                                        Toast.LENGTH_LONG).show();
                             }
+                            progressBar.setVisibility(View.GONE);
                         });
 
 
@@ -562,5 +581,9 @@ public class LoginUserEmailActivity extends AppCompatActivity {
 
         return "JAN";
     }
+
+
+
+
 
 }

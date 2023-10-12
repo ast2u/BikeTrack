@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
         app:title="User Profile"
+
         app:menu="@menu/top_app_bar"
         />
 </com.google.android.material.appbar.AppBarLayout>
@@ -237,9 +238,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="User Data Routes"
+                android:id="@+id/textView_routesTitle"
                 android:textAllCaps="false"
                 android:textStyle="bold"
                 android:textSize="20sp" />
+            <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:id="@+id/listview_Routes"
+                android:layout_below="@id/textView_routesTitle"/>
 
         </RelativeLayout>
         <Button

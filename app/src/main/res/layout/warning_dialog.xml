@@ -31,7 +31,7 @@
             android:id="@+id/textDescDialog"
             android:gravity="center_horizontal"
             android:textSize="15sp"
-            android:text="Loading..."
+            android:text="@string/warning1"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
@@ -42,19 +42,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/dialogButtonDone"
-            android:text="Continue"
+            android:text="Start"
             android:textSize="14sp"
             android:background="@drawable/rounded_corner"
             android:layout_marginTop="25dp"
-            android:layout_marginStart="40dp"
-
             android:backgroundTint="@color/yellowWarning"
             android:textAllCaps="false"
-            android:layout_marginEnd="40dp"
+
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/dialogButtonCancel"
             app:layout_constraintTop_toBottomOf="@id/textDescDialog"
 
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/dialogButtonCancel"
+            android:text="Cancel"
+            android:textAllCaps="false"
+            android:background="@drawable/rounded_corner"
+            android:backgroundTint="@color/red"
+            android:layout_marginTop="25dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/dialogButtonDone"
+            app:layout_constraintTop_toBottomOf="@id/textDescDialog"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

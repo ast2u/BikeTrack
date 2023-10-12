@@ -6,6 +6,9 @@
     <string name="navigation_drawer_close">Close Navigation drawer</string>
     <string name="title_activity_maps_main">MapsMainActivity</string>
     <string name="google_maps_key">AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8</string>
+    <string name="warning1">Do you want to start the SOS Signal? Be reminded that it will
+        set your location publicly at all times.</string>
+    <string name="warning2">Please don\'t try to move from your position. A help is on the way!</string>
 
 
 </resources>
