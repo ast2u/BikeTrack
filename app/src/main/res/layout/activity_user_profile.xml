@@ -15,8 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
-        app:title="User Profile"
-
+        app:title="Profile"
         app:menu="@menu/top_app_bar"
         />
 </com.google.android.material.appbar.AppBarLayout>
@@ -34,51 +33,57 @@
             android:layout_height="wrap_content"
             android:background="#6F826A"
             >
-
-         <!--
-            <Button
-                android:id="@+id/idB_settingButton"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_alignParentRight="true"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
-                android:clickable="true"
-                android:padding="6dp"
-                android:background="@drawable/baseline_settings_24"/>
-            -->
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="170dp"
-                android:padding="8dp"
-                android:layout_marginTop="5dp"
-                android:id="@+id/defaultprofilepic"
-                android:src="@drawable/userprofilepic"/>
-            <TextView
-                android:id="@+id/icd_unameprofile"
-                android:layout_width="wrap_content"
+            <androidx.cardview.widget.CardView
+                android:layout_width="330dp"
+                android:layout_centerInParent="true"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:hint="Loading..."
-                android:textColor="@color/white"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_marginTop="6dp"
-                android:layout_marginBottom="15dp"
-                android:textSize="25sp"
-                android:layout_below="@+id/defaultprofilepic"
-                />
+                app:cardUseCompatPadding="true"
+                android:elevation="10dp"
+                app:cardCornerRadius="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#6F826A"
+                    android:orientation="vertical">
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/defaultprofilepic"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+
+                    android:layout_marginTop="5dp"
+                    android:padding="8dp"
+                    android:src="@drawable/userprofilepic"
+                    app:shapeAppearanceOverlay="@drawable/circular_profile_pic" />
+
+                <TextView
+                    android:id="@+id/icd_unameprofile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="15dp"
+
+                    android:ellipsize="end"
+                    android:hint="Loading..."
+                    android:maxLines="1"
+                    android:textColor="@color/black"
+                    android:textSize="25sp" />
+
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:layout_margin="15dp"
+            android:id="@+id/user_Details"
+            android:padding="15dp"
+            android:layout_margin="10dp"
             android:background="@color/greyish"
-
             >
 
             <!--show name-->
@@ -106,101 +111,12 @@
                 android:id="@+id/divider_nameprofile"
                 />
 
-            <!--show email-->
-            <ImageView
-                android:id="@+id/profileiconemail"
-                android:layout_below="@id/divider_nameprofile"
-                android:layout_marginTop="30dp"
-                android:layout_width="49dp"
-                android:layout_height="37dp"
-
-                android:src="@drawable/baseline_email_24_greeny" />
-
-            <TextView
-                android:id="@+id/icd_emailprofile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_below="@id/divider_nameprofile"
-                android:layout_alignStart="@id/profileiconemail"
-                android:layout_marginStart="70dp"
-                android:layout_marginTop="30dp"
-                android:text="Loading..."
-                android:textSize="25sp" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"
-                android:layout_below="@id/profileiconemail"
-                android:background="@color/greendark"
-                android:id="@+id/divider_emailprofile"
-                />
-
-
-            <!--show bdate-->
-            <ImageView
-                android:id="@+id/profileiconbdate"
-                android:layout_below="@id/divider_emailprofile"
-                android:layout_marginTop="30dp"
-                android:layout_width="49dp"
-                android:layout_height="37dp"
-                android:src="@drawable/baseline_cake_24" />
-
-            <TextView
-                android:id="@+id/icd_bdateprofile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@id/profileiconbdate"
-                android:layout_marginStart="70dp"
-                android:layout_below="@id/divider_emailprofile"
-                android:layout_marginTop="30dp"
-                android:text="Loading..."
-                android:textSize="25sp" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"
-                android:layout_below="@id/profileiconbdate"
-                android:background="@color/greendark"
-                android:id="@+id/divider_bdateprofile"
-                />
-
-            <!--show gender-->
-
-            <ImageView
-                android:id="@+id/profileicongender"
-                android:layout_below="@id/divider_bdateprofile"
-                android:layout_marginTop="30dp"
-                android:layout_width="49dp"
-                android:layout_height="37dp"
-                android:src="@drawable/gender_icon" />
-
-            <TextView
-                android:id="@+id/icd_genderprofile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@id/profileiconbdate"
-                android:layout_marginStart="70dp"
-                android:layout_below="@id/divider_bdateprofile"
-                android:layout_marginTop="30dp"
-                android:text="Loading..."
-                android:textSize="25sp" />
-            <View
-                android:layout_width="match_parent"
-                android:id="@+id/divider_genderprofile"
-                android:layout_height="1dp"
-                android:layout_marginTop="15dp"
-                android:layout_below="@id/profileicongender"
-                android:background="@color/greendark"
-
-                />
 
             <!--show mobile-->
 
             <ImageView
                 android:id="@+id/profileiconmobile"
-                android:layout_below="@id/divider_genderprofile"
+                android:layout_below="@id/divider_nameprofile"
                 android:layout_marginTop="30dp"
                 android:layout_width="49dp"
                 android:layout_height="37dp"
@@ -212,26 +128,91 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@id/profileiconmobile"
                 android:layout_marginStart="70dp"
-                android:layout_below="@id/divider_genderprofile"
+                android:layout_below="@id/divider_nameprofile"
                 android:layout_marginTop="30dp"
                 android:text="Loading..."
                 android:textSize="25sp" />
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBarprofile"
-                android:layout_centerInParent="true"
-                android:elevation="10dp"
-                android:visibility="gone"
-                />
+
+
 
         </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:background="@color/greyish"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                android:layout_marginBottom="10dp"
+                android:id="@+id/title_EmContacts"
+                android:text="Emergency Contacts"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/edit_errornullemergency"
+                android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:layout_marginBottom="10dp"
+                android:text="There is no current Emergency Number."/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/text_clickemergency"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="Please add an Emergency Number!"/>
+            </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/show_emergency"
+                android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Emergency Number 1"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/emContacts1"
+                android:text="Loading.."/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:background="@color/greendark"
+                    />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Emergency Number 2"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/emContacts2"
+                android:text="Loading.."/>
+            </LinearLayout>
+
+        </LinearLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            android:layout_margin="15dp"
+            android:layout_margin="10dp"
             android:background="@color/greyish">
 
             <TextView
@@ -250,19 +231,9 @@
                 android:layout_below="@id/textView_routesTitle"/>
 
         </RelativeLayout>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_marginTop="20dp"
-            android:id="@+id/logoutbutton"
-            android:padding="10dp"
-            android:layout_marginBottom="150dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="LOGOUT"
-            android:background="@drawable/rounded_corner"
-            />
 
     </LinearLayout>
+
 
 </androidx.core.widget.NestedScrollView>
 
@@ -301,6 +272,14 @@
         app:maxImageSize="45dp"
         android:backgroundTint="@color/red"
         app:layout_anchor="@id/bottomAppBar"/>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBarprofile"
+       android:layout_gravity="center"
+        android:elevation="10dp"
+        android:visibility="gone"
+        />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

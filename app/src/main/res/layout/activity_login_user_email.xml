@@ -110,16 +110,13 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textView7"
+                android:id="@+id/Termtext_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="By continuing you agree to our Terms of Service"
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
-                android:textSize="14sp"
-                />
-
-
+                android:text="By continuing you agree to our Terms And Conditions"
+                android:textSize="14sp" />
 
 
         </LinearLayout>

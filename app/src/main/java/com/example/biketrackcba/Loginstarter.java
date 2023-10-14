@@ -20,6 +20,7 @@ private FirebaseAuth nAuth;
         setContentView(R.layout.activity_main);
         lgEmail=findViewById(R.id.loginEmail);
         nAuth=FirebaseAuth.getInstance();
+        lgGmail=findViewById(R.id.loginGmail);
         if(NetworkUtils.isNetworkAvailable(this)) {
             lgEmail.setOnClickListener(view -> {
                 Intent intnext = new Intent(Loginstarter.this, LoginUserEmailActivity.class);
@@ -33,6 +34,11 @@ private FirebaseAuth nAuth;
 
             });
         }
+        lgGmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
     }
 
     @Override

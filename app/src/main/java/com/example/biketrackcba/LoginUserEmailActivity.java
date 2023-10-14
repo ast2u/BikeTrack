@@ -24,6 +24,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.TextKeyListener;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -57,6 +58,7 @@ import java.util.regex.Pattern;
 public class LoginUserEmailActivity extends AppCompatActivity {
     private EditText nEmail, nPass;
     private EditText nrName, nrEmail, nrUsername, nrPass, nrMobile, nrBdate;
+    private TextView termsLogin;
     private TextView regisLayout, loginLayout;
     private DatePickerDialog datepd;
     private Button nLogin, nRegister;
@@ -67,9 +69,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     private static final String TAG = "RegisterLayoutActivity";
     private static final String TAG1 = "LoginLayoutActivity";
     private CheckBox termCheckbox;
-    FirebaseDatabase database;
-    DatabaseReference reference;
-    private FirebaseAuth.AuthStateListener firebaseAuthListener;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -82,6 +82,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         nEmail = findViewById(R.id.idemail);
         nPass = findViewById(R.id.idpassw);
         nLogin = findViewById(R.id.nLoginbut);
+        termsLogin= findViewById(R.id.Termtext_view);
         progressBar1 = findViewById(R.id.progressBarLogin);
         nAuth = FirebaseAuth.getInstance();
 
@@ -124,7 +125,27 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 }
             }
         });
+        SpannableString spanString = new SpannableString(termsLogin.getText());
+        ClickableSpan clickSpan = new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View view) {
 
+                showCustomDialogTerms();
+            }
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(true);
+                ds.setColor(Color.WHITE);
+            }
+        };
+
+        int startIndex = termsLogin.getText().toString().indexOf("Terms And Conditions");
+        int endIndex = startIndex + "Terms And Conditions".length();
+        spanString.setSpan(clickSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        termsLogin.setMovementMethod(LinkMovementMethod.getInstance());
+        termsLogin.setHighlightColor(Color.TRANSPARENT);
 
     }
 
@@ -195,6 +216,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     public void loginlayoutbutton(View view){
         setContentView(R.layout.activity_login_user_email);
         nEmail = findViewById(R.id.idemail);
+        termsLogin= findViewById(R.id.Termtext_view);
         nPass = findViewById(R.id.idpassw);
         nLogin = findViewById(R.id.nLoginbut);
         progressBar1 = findViewById(R.id.progressBarLogin);
@@ -235,6 +257,29 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 loginUser(Lemail, Lpwd);
             }
         });
+        SpannableString spannableString = new SpannableString(termsLogin.getText());
+        ClickableSpan clickableSpan = new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View view) {
+
+                showCustomDialogTerms();
+            }
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(true);
+                ds.setColor(Color.WHITE);
+            }
+        };
+
+        int startIndex = termsLogin.getText().toString().indexOf("Terms And Conditions");
+        int endIndex = startIndex + "Terms And Conditions".length();
+
+
+        spannableString.setSpan(clickableSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        termsLogin.setMovementMethod(LinkMovementMethod.getInstance());
+        termsLogin.setHighlightColor(Color.TRANSPARENT);
 
     }
 
@@ -280,7 +325,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
             public void onClick(@NonNull View view) {
-                Log.d(TAG,"i am clickable");
+
                 showCustomDialogTerms();
             }
 
@@ -288,11 +333,13 @@ public class LoginUserEmailActivity extends AppCompatActivity {
             public void updateDrawState(@NonNull TextPaint ds) {
                 super.updateDrawState(ds);
                 ds.setUnderlineText(true);
+                ds.setColor(Color.WHITE);
             }
         };
 
         int startIndex = termCheckbox.getText().toString().indexOf("Terms And Conditions");
         int endIndex = startIndex + "Terms And Conditions".length();
+
 
         spannableString.setSpan(clickableSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
@@ -314,6 +361,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
             String mobile = nrMobile.getText().toString();
             String textGender;
             String password = nrPass.getText().toString();
+
 
             String mobileRegex = "[0][0-9]{9}"; //First no. will be 0 to 11 digits
             Matcher mobileMatcher;
@@ -475,8 +523,9 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                         ReadWrite_UserDetails writeUserDetails = new ReadWrite_UserDetails(username,bdate,textGender,mobile);
 
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
-
                         reference.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(task1 -> {
+                            reference.child(firebaseUser.getUid()).child("emergencynumber").child("em1").setValue("");
+                            reference.child(firebaseUser.getUid()).child("emergencynumber").child("em2").setValue("");
 
                             if(task1.isSuccessful()){
                                 firebaseUser.sendEmailVerification();
@@ -496,6 +545,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                             }
                             progressBar.setVisibility(View.GONE);
                         });
+
 
 
 

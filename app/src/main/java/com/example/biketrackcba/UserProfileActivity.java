@@ -4,6 +4,9 @@ import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.viewpager2.widget.ViewPager2;
 
 
 import android.annotation.SuppressLint;
@@ -15,6 +18,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,13 +27,18 @@ import android.view.View;
 import android.widget.Button;
 
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -48,16 +58,17 @@ import java.util.List;
 
 public class UserProfileActivity extends AppCompatActivity {
 
-    private TextView textVUsern, textVFname, textVEmail,textVbdate, textVgender,textVmobile;
+    private TextView textVUsern, textVFname,textVbdate, textVgender,textVmobile;
     private ProgressBar progressBar;
-    private Button tempButtonLogout;
+    private TextView textEm1, textEm2;
     private GoogleMap gMap;
     private String usern,fname,Temail,bdate,gender,mobile;
-    //private Button imageRefresh;
-
-
-
+    private String EMnum1, EMnum2;
     private BottomNavigationView bottomNavigationView;
+    private LinearLayout emergencylayout,emergencylayout2;
+
+    private MaterialToolbar topAppbar;
+
 
     private FirebaseAuth nAuthprof;
     @SuppressLint("MissingInflatedId")
@@ -68,14 +79,37 @@ public class UserProfileActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBarprofile);
         textVUsern = findViewById(R.id.icd_unameprofile);
         textVFname = findViewById(R.id.icd_nameprofile);
-        textVEmail = findViewById(R.id.icd_emailprofile);
-        textVbdate = findViewById(R.id.icd_bdateprofile);
-        textVgender = findViewById(R.id.icd_genderprofile);
-
+        textEm1 = findViewById(R.id.emContacts1);
+        textEm2 = findViewById(R.id.emContacts2);
+        topAppbar = findViewById(R.id.topAppBar);
         textVmobile = findViewById(R.id.icd_mobileprofile);
+        emergencylayout = findViewById(R.id.edit_errornullemergency);
+        emergencylayout2 = findViewById(R.id.show_emergency);
+
+        topAppbar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if(id==R.id.mLogout){
+                Toast.makeText(UserProfileActivity.this,"Logged Out",Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(UserProfileActivity.this, Loginstarter.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                nAuthprof.signOut();
+                startActivity(intent);
+                finish();
+            } else if (id==R.id.more_profile_D) {
+                Intent intent = new Intent(UserProfileActivity.this,MoreUserProfileActivity.class);
+                startActivity(intent);
+                
+            } else if (id==R.id.more_editProf) {
+                Intent intent = new Intent(UserProfileActivity.this,EditProfile.class);
+                startActivity(intent);
+                finish();
+            }
+            return false;
+        });
+
 
         //hook
-      //  imageRefresh = findViewById(R.id.idB_settingButton);
         bottomNavigationView = findViewById(R.id.bottomNavView);
         Menu menu = bottomNavigationView.getMenu();
         bottomNavigationView.setSelectedItemId(R.id.miProfile);
@@ -112,21 +146,6 @@ public class UserProfileActivity extends AppCompatActivity {
         });
 
 
-        // Temporary Logout Button
-        tempButtonLogout = findViewById(R.id.logoutbutton);
-        tempButtonLogout.setOnClickListener(view -> {
-            Toast.makeText(UserProfileActivity.this,"Logged Out",Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(UserProfileActivity.this, Loginstarter.class);
-
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    | Intent.FLAG_ACTIVITY_NEW_TASK);
-            nAuthprof.signOut();
-            startActivity(intent);
-            finish();
-
-        });
-
-        //  .....
         /*
         navigationView = findViewById(R.id.nav_view);
         setSupportActionBar(findViewById(R.id.univ_toolbar));
@@ -144,18 +163,6 @@ public class UserProfileActivity extends AppCompatActivity {
          */
 
 
-       /* imageRefresh.setOnClickListener(view -> {
-
-            Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
-            startActivity(intent);
-            overridePendingTransition(2,2);
-
-
-        });
-
-        */
-
-
         nAuthprof = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = nAuthprof.getCurrentUser();
 
@@ -166,6 +173,7 @@ public class UserProfileActivity extends AppCompatActivity {
         }else {
             progressBar.setVisibility(View.VISIBLE);
             showUserProfile(firebaseUser);
+
         }
 
 
@@ -198,20 +206,31 @@ public class UserProfileActivity extends AppCompatActivity {
                 if(readUserDetails!=null){
 
                     fname = firebaseUser.getDisplayName();
-                    Temail = firebaseUser.getEmail();
+                  //  Temail = firebaseUser.getEmail();
                     usern = readUserDetails.username;
-                    bdate = readUserDetails.bdate;
-                    gender = readUserDetails.gender;
+                  //  bdate = readUserDetails.bdate;
+                  //  gender = readUserDetails.gender;
                     mobile = readUserDetails.mobile;
 
 
                     textVUsern.setText("Welcome, "+usern+"!");
                     textVFname.setText(fname);
-                    textVEmail.setText(Temail);
-                    textVbdate.setText(bdate);
-                    textVgender.setText(gender);
+                //    textVEmail.setText(Temail);
+               //     textVbdate.setText(bdate);
+                //    textVgender.setText(gender);
                     textVmobile.setText(mobile);
                 }
+                EMnum1 = snapshot.child("emergencynumber").child("em1").getValue().toString();
+                EMnum2 = snapshot.child("emergencynumber").child("em2").getValue().toString();
+                if(EMnum1.isEmpty() && EMnum2.isEmpty()) {
+                    emergencylayout.setVisibility(View.VISIBLE);
+                    emergencylayout2.setVisibility(View.GONE);
+                }else{
+                    emergencylayout2.setVisibility(View.VISIBLE);
+                    emergencylayout.setVisibility(View.GONE);
+                }
+                textEm1.setText(EMnum1);
+                textEm2.setText(EMnum2);
                 progressBar.setVisibility(View.GONE);
             }
 

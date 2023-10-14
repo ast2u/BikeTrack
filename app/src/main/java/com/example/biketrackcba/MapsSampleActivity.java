@@ -65,6 +65,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 ;
+import android.os.PowerManager;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -72,6 +73,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
@@ -134,6 +136,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private ProgressBar progressBar,sosProgressBar;
+    private ValueEventListener valueEventListener;
     private GoogleMap mMap;
 
     private LatLng destinationLocation;
@@ -180,6 +183,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private TextView saveDialogText;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,14 +191,15 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         progressBar = findViewById(R.id.progressBarMaps);
         sosProgressBar = findViewById(R.id.start_sosButtonLoading);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         user = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = user.getUid();
         database = FirebaseDatabase.getInstance();
+        checkLocationPermission();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
-
-        checkLocationPermission();
         LocationUtils.checkLocationSettings(this);
         locationUpdaterFirebase = new LocationUpdaterFirebase(this);
         sosMediaplayer = MediaPlayer.create(this,R.raw.sos_sound);
@@ -325,22 +330,17 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.miHome) {
-                    startActivity(getIntent());
-                    finish();
                     overridePendingTransition(0, 0);
                 } else if (id == R.id.miSocials) {
                     Intent intent = new Intent(MapsSampleActivity.this, UserSocialsActivity.class);
                     startActivity(intent);
-                    finish();
                 } else if (id == R.id.miDiscover) {
                     Intent intent = new Intent(MapsSampleActivity.this, DiscoverUserActivity.class);
                     startActivity(intent);
-                    finish();
-
                 } else if (id == R.id.miProfile) {
                     Intent intent = new Intent(MapsSampleActivity.this, UserProfileActivity.class);
                     startActivity(intent);
-                    finish();
+
                 }
                 return false;
             }
@@ -349,7 +349,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private boolean isSosStarted = false;
     private void SosStarted (){
         if(!isSosStarted) {
-            Toast.makeText(this,"You won't be able to navigate to other menu",Toast.LENGTH_LONG).show();
             sosProgressBar.setVisibility(View.VISIBLE);
             RcardView.setVisibility(View.GONE);
             sViewB.setVisibility(View.GONE);
@@ -363,6 +362,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
             startBDialog.findViewById(R.id.dialogButtonDone).setOnClickListener(view1 -> {
                 alertDialog.dismiss();
+                Toast.makeText(this,"You won't be able to navigate to other menu",Toast.LENGTH_LONG).show();
                 playSOSsound();
                 locationUpdaterFirebase.stopLocationFirebaseUpdates();
                 sosAlertSignal = new SosAlertSignal(this);
@@ -437,6 +437,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d(TAG, "onPause: is running");
         stopLocationUpdates();
     }
 
@@ -450,6 +451,13 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        otherUsersRef.removeEventListener(valueEventListener);
+        locationUpdaterFirebase.stopLocationFirebaseUpdates();
+        Log.d(TAG, "onDestroy: is running");
+        String userId = user.getUid();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("BikersAvailable");
+        GeoFire geoFire = new GeoFire(ref);
+        geoFire.removeLocation(userId);
         stopLocationUpdates();
     }
 
@@ -464,10 +472,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onStop() {
         super.onStop();
-        String userId = user.getUid();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("BikersAvailable");
-        GeoFire geoFire = new GeoFire(ref);
-        geoFire.removeLocation(userId);
         stopLocationUpdates();
 
     }
@@ -977,7 +981,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private List<Marker> otherUserSignalMarker = new ArrayList<>();
     private void drawOtherUsersMarker(){
         CompletableFuture.runAsync(()->{
-        otherUsersRef.addValueEventListener(new ValueEventListener() {
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
@@ -1019,6 +1023,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                             Bitmap originalBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.defaultusermarker);
                             Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap,65, 65, true);
                             BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap);
+                            String timeandTxt = timestamp+"\nI Need Help";
                             
                             if(sosSignal==false) {
                                 MarkerOptions markerOptions = new MarkerOptions()
@@ -1033,8 +1038,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                 MarkerOptions markerOptions = new MarkerOptions()
                                         .position(userLocation)
                                         .title(username)
-                                        .snippet(timestamp)
-                                        .snippet("Need Help!");
+                                        .snippet(timeandTxt);
+
                                 Marker marker = mMap.addMarker(markerOptions);
                                 marker.setTag(marker);
                                 
@@ -1052,7 +1057,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "Failed to retrieve other users' locations", error.toException());
             }
-        });
+        };
+        otherUsersRef.addValueEventListener(valueEventListener);
         });
     }
 

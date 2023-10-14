@@ -87,7 +87,6 @@
             android:id="@+id/loginGmail"
             android:layout_width="341dp"
             android:layout_height="61dp"
-
             android:text="Continue with Google"
             android:textAllCaps="false"
             android:layout_marginTop="40dp"

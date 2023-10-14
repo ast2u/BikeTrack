@@ -9,16 +9,20 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/more1"
+        android:id="@+id/more_profile_D"
         android:title="More Profile Details"
         app:showAsAction="never" />
     <item
-        android:id="@+id/more2"
+        android:id="@+id/more_editProf"
         android:title="Edit Profile"
         app:showAsAction="never" />
     <item
         android:id="@+id/more3"
         android:title="Privacy"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/mLogout"
+        android:title="Logout"
         app:showAsAction="never" />
 
 </menu>

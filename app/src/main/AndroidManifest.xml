@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -18,6 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Biketrackcba"
         tools:targetApi="31">
+        <activity
+            android:name=".EditProfile"
+            android:exported="false" />
+        <activity
+            android:name=".MoreUserProfileActivity"
+            android:exported="false" />
         <activity
             android:name=".DiscoverUserActivity"
             android:exported="false" />
@@ -58,7 +64,7 @@
         <activity
             android:name=".LoginUserEmailActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainStartLoadingScreen"
             android:exported="true">
