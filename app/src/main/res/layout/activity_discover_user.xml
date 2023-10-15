@@ -2,11 +2,13 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/recyclerview_route_data"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/greenish"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="8dp"
     tools:context=".DiscoverUserActivity">
-
 
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -35,45 +37,46 @@
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/start_sosButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/start_sosButton"
-        android:src="@drawable/baseline_sos_24"
-        android:elevation="1dp"
-        app:maxImageSize="45dp"
         android:backgroundTint="@color/red"
-        app:layout_anchor="@id/bottomAppBar"/>
+        android:elevation="1dp"
+        android:src="@drawable/baseline_sos_24"
+        app:layout_anchor="@id/bottomAppBar"
+        app:maxImageSize="45dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-    <SearchView
-        android:id="@+id/searchView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:background="@drawable/bg_searchbutton"
-        android:iconifiedByDefault="false"
-        android:queryHint="Search For Routes" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/PopularRoutes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/cardview_default_elevation"
-                android:text="Popular Routes"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="@drawable/bg_searchbutton"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search For Routes" />
 
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="34dp"
-                android:background="@drawable/discover_icon" >
+        <TextView
+            android:id="@+id/PopularRoutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/cardview_default_elevation"
+            android:text="Popular Routes"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/white"
+            android:textSize="23dp"/>
 
 
-            </ImageButton>>
 
-        </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/userlist"/>
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
