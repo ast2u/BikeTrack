@@ -361,6 +361,8 @@ public class LoginUserEmailActivity extends AppCompatActivity {
             String mobile = nrMobile.getText().toString();
             String textGender;
             String password = nrPass.getText().toString();
+            String emergencynumber1 = "";
+            String emergencynumber2 = "";
 
 
             String mobileRegex = "[0][0-9]{9}"; //First no. will be 0 to 11 digits
@@ -412,7 +414,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 Toast.makeText(LoginUserEmailActivity.this,"Please select your Gender",Toast.LENGTH_LONG).show();
                 radioButtonRegisterGenderSelected.setError("Gender is Required");
                 radioButtonRegisterGenderSelected.requestFocus();
-            } else if (nrMobile.length()!=11) {
+            } else if (mobile.length()!=11) {
                 Toast.makeText(LoginUserEmailActivity.this,"Please re-enter your Mobile Number",Toast.LENGTH_LONG).show();
                 nrMobile.setError("Mobile No. should be 11 digits");
                 nrMobile.requestFocus();
@@ -432,7 +434,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 textGender = radioButtonRegisterGenderSelected.getText().toString();
                 progressBar.setVisibility(View.VISIBLE);
                 String nameOutput = capitalizeFirstLetter(name);
-                registerUser(nameOutput,email,username,bdate,mobile,textGender,password);
+                registerUser(nameOutput,email,username,bdate,mobile,textGender,password,emergencynumber1,emergencynumber2);
             }
 
         });
@@ -508,7 +510,8 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     }
 
 
-    private void registerUser(String Fname, String email, String username, String bdate, String mobile, String textGender, String password) {
+    private void registerUser(String Fname, String email, String username, String bdate, String mobile, String textGender, String password,
+    String emnumber1, String emnumber2) {
         nAuth = FirebaseAuth.getInstance();
         nAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(LoginUserEmailActivity.this,
                 task -> {
@@ -520,12 +523,12 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                         UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(Fname).build();
                         firebaseUser.updateProfile(profileChangeRequest);
 
-                        ReadWrite_UserDetails writeUserDetails = new ReadWrite_UserDetails(username,bdate,textGender,mobile);
+                        ReadWrite_UserDetails writeUserDetails = new ReadWrite_UserDetails(username,bdate,textGender,mobile,emnumber1,emnumber2);
 
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
                         reference.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(task1 -> {
-                            reference.child(firebaseUser.getUid()).child("emergencynumber").child("em1").setValue("");
-                            reference.child(firebaseUser.getUid()).child("emergencynumber").child("em2").setValue("");
+                         //   reference.child(firebaseUser.getUid()).child("emergencynumber").child("em1").setValue("");
+                         //   reference.child(firebaseUser.getUid()).child("emergencynumber").child("em2").setValue("");
 
                             if(task1.isSuccessful()){
                                 firebaseUser.sendEmailVerification();
@@ -572,15 +575,6 @@ public class LoginUserEmailActivity extends AppCompatActivity {
 
     }
 
-    private String getTodaysDate(){
-        Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        month = month+1;
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        return makeDateString(day,month,year);
-    }
-
 
     private void initDatePicker(){
 
@@ -600,38 +594,6 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         });
 
     }
-    private  String makeDateString(int day, int month, int year){
-        return getMonthFormat(month) +" "+day+" "+year;
-    }
-    private String getMonthFormat(int month){
-        if (month==1)
-            return "JAN";
-        if (month==2)
-            return "FEB";
-        if (month==3)
-            return "MAR";
-        if (month==4)
-            return "APR";
-        if (month==5)
-            return "MAY";
-        if (month==6)
-            return "JUN";
-        if (month==7)
-            return "JUL";
-        if (month==8)
-            return "AUG";
-        if (month==9)
-            return "SEP";
-        if (month==10)
-            return "OCT";
-        if (month==11)
-            return "NOV";
-        if (month==12)
-            return "DEC";
-
-        return "JAN";
-    }
-
 
 
 

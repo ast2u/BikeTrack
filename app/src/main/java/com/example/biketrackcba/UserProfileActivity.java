@@ -34,6 +34,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -69,7 +70,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private MaterialToolbar topAppbar;
 
-
+    private LocationUpdaterFirebase locationUpdaterFirebase;
     private FirebaseAuth nAuthprof;
     @SuppressLint("MissingInflatedId")
     @Override
@@ -103,7 +104,7 @@ public class UserProfileActivity extends AppCompatActivity {
             } else if (id==R.id.more_editProf) {
                 Intent intent = new Intent(UserProfileActivity.this,EditProfile.class);
                 startActivity(intent);
-                finish();
+
             }
             return false;
         });
@@ -211,6 +212,8 @@ public class UserProfileActivity extends AppCompatActivity {
                   //  bdate = readUserDetails.bdate;
                   //  gender = readUserDetails.gender;
                     mobile = readUserDetails.mobile;
+                    EMnum1 = readUserDetails.emnumber1;
+                    EMnum2 = readUserDetails.emnumber2;
 
 
                     textVUsern.setText("Welcome, "+usern+"!");
@@ -220,8 +223,6 @@ public class UserProfileActivity extends AppCompatActivity {
                 //    textVgender.setText(gender);
                     textVmobile.setText(mobile);
                 }
-                EMnum1 = snapshot.child("emergencynumber").child("em1").getValue().toString();
-                EMnum2 = snapshot.child("emergencynumber").child("em2").getValue().toString();
                 if(EMnum1.isEmpty() && EMnum2.isEmpty()) {
                     emergencylayout.setVisibility(View.VISIBLE);
                     emergencylayout2.setVisibility(View.GONE);

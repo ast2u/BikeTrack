@@ -9,6 +9,9 @@
     <string name="warning1">Do you want to start the SOS Signal? Be reminded that it will
         set your location publicly at all times.</string>
     <string name="warning2">Please don\'t try to move from your position. A help is on the way!</string>
-
+    <string-array name="gender_array">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
 
 </resources>

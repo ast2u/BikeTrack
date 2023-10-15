@@ -133,7 +133,6 @@
                 android:id="@+id/radio_female"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:padding="8dp"
                 android:text="Female"
                 android:textColor="@color/black"
@@ -143,7 +142,6 @@
                 android:id="@+id/radio_male"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:padding="8dp"
                 android:text="Male"
                 android:textColor="@color/black"

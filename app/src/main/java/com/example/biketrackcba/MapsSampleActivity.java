@@ -438,6 +438,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause: is running");
+        locationUpdaterFirebase.stopLocationFirebaseUpdates();
         stopLocationUpdates();
     }
 
@@ -453,7 +454,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         super.onDestroy();
         otherUsersRef.removeEventListener(valueEventListener);
         locationUpdaterFirebase.stopLocationFirebaseUpdates();
-        Log.d(TAG, "onDestroy: is running");
         String userId = user.getUid();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("BikersAvailable");
         GeoFire geoFire = new GeoFire(ref);
@@ -710,10 +710,13 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
 
                 DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
-                String routeId = routesref.push().getKey();
-                routesref.child(routeId).child("points").setValue(routePoints);
-                routesref.child(routeId).child("title").setValue(titleR);
-                routesref.child(routeId).child("desc").setValue(descR);
+                //String routeId = routesref.push().getKey();
+               // routesref.child(routeId).child("points").setValue(routePoints);
+               // routesref.child(routeId).child("title").setValue(titleR);
+               // routesref.child(routeId).child("desc").setValue(descR);
+                routesref.child("points").setValue(routePoints);
+                routesref.child("title").setValue(titleR);
+                routesref.child("desc").setValue(descR);
                 Toast.makeText(this,"Route saved succesfully",Toast.LENGTH_SHORT).show();
 
                 for (Polyline polyline : routePolyline){

@@ -219,13 +219,13 @@
                 android:text="If you delete your account, the data stored in the application will be permanently deleted."/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
     <ProgressBar
+        android:id="@+id/PBprofile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/PBprofile"
         android:layout_gravity="center"
         android:elevation="10dp"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

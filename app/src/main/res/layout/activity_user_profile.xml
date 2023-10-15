@@ -46,7 +46,7 @@
                     android:layout_height="match_parent"
                     android:background="#6F826A"
                     android:orientation="vertical">
-                <com.google.android.material.imageview.ShapeableImageView
+                <ImageView
                     android:id="@+id/defaultprofilepic"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
@@ -148,8 +148,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
-                android:textSize="17sp"
-                android:layout_marginBottom="10dp"
+                android:textSize="20sp"
+                android:layout_marginBottom="15dp"
                 android:id="@+id/title_EmContacts"
                 android:text="Emergency Contacts"/>
             <LinearLayout
@@ -168,8 +168,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/text_clickemergency"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
+                    android:textColor="@color/red"
                     android:textStyle="bold"
+                    android:drawableStart="@drawable/baseline_notification_important_24"
+                    android:drawablePadding="10dp"
                     android:text="Please add an Emergency Number!"/>
             </LinearLayout>
 
@@ -182,11 +185,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
+                android:textSize="17sp"
                 android:text="Emergency Number 1"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/emContacts1"
+                android:textSize="16sp"
                 android:text="Loading.."/>
                 <View
                     android:layout_width="match_parent"
@@ -199,11 +204,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
+                android:textSize="17sp"
                 android:text="Emergency Number 2"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/emContacts2"
+                android:textSize="16sp"
                 android:text="Loading.."/>
             </LinearLayout>
 

@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EditProfile">
+    <ProgressBar
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center"
+        android:id="@+id/edit_Pbar"
+        android:visibility="gone"
+        android:elevation="10dp"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +39,7 @@
         android:padding="20dp"
         android:background="@color/greenish"
         >
-        <com.google.android.material.imageview.ShapeableImageView
+        <ImageView
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:id="@+id/user_Profilepic"
@@ -56,7 +67,7 @@
             android:layout_toRightOf="@id/user_Profilepic"
             android:id="@+id/textedit_username"
             android:textColor="@color/black"
-            android:text="Loading.."/>
+            android:text="Change Profile Picture"/>
     </RelativeLayout>
 
     <LinearLayout
@@ -67,9 +78,13 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Emergency Contact"
+            android:text="Please set your Emergency Contact!"
             android:drawableStart="@drawable/baseline_notification_important_24"
             android:drawablePadding="6dp"
+            android:textStyle="bold"
+            android:id="@+id/textView_titleEmcontacts"
+            android:visibility="gone"
+            android:textColor="@color/red"
             android:layout_marginBottom="10dp"/>
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -84,7 +99,7 @@
                 android:drawablePadding="10dp"
                 android:layout_height="wrap_content"
                 android:text="Loading.."
-                android:drawableStart="@drawable/baseline_person_green24"/>
+                android:drawableStart="@drawable/baseline_contact_emergency_24"/>
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -99,7 +114,7 @@
                 android:drawablePadding="10dp"
                 android:layout_height="wrap_content"
                 android:text="Loading.."
-                android:drawableStart="@drawable/baseline_person_green24"/>
+                android:drawableStart="@drawable/baseline_contact_emergency_24"/>
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -152,7 +167,7 @@
             android:padding="10dp"
             android:layout_marginBottom="10dp"
             android:background="@color/greyish"
-            android:id="@+id/PeditText_e">
+            android:id="@+id/PeditText_bdate">
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:drawablePadding="10dp"
@@ -161,29 +176,34 @@
                 android:drawableStart="@drawable/baseline_cake_24"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Gender"
-            android:padding="10dp"
             android:layout_marginBottom="10dp"
-            android:background="@color/greyish"
-            android:id="@+id/PeditText_gender">
-            <com.google.android.material.textfield.TextInputEditText
+            android:padding="10dp"
+            android:orientation="vertical"
+            android:background="@color/greyish">
+            <TextView
                 android:layout_width="match_parent"
-                android:drawablePadding="10dp"
                 android:layout_height="wrap_content"
-                android:text="Loading.."
+                android:text="Gender"
                 android:drawableStart="@drawable/gendericonsize"
-                />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:drawablePadding="10dp"
+                android:layout_marginBottom="10dp"/>
+        <Spinner
+            android:id="@+id/spinner_gender"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+             />
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Mobile Number"
             android:padding="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
             android:background="@color/greyish"
             android:id="@+id/PeditText_usernumber">
             <com.google.android.material.textfield.TextInputEditText
@@ -196,11 +216,14 @@
         </com.google.android.material.textfield.TextInputLayout>
 <Button
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:id="@+id/update_profButton"
+    android:layout_height="70dp"
     android:backgroundTint="@color/greenish"
     android:textColor="@color/white"
     android:text="update"/>
 
     </LinearLayout>
+
 </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

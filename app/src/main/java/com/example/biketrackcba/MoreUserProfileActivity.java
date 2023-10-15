@@ -2,9 +2,11 @@ package com.example.biketrackcba;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -27,6 +29,7 @@ public class MoreUserProfileActivity extends AppCompatActivity {
     private MaterialToolbar topAppbar;
     private Button BxtraLogout, BdeleteAcc;
     private FirebaseAuth nAuthprof;
+    private MaterialToolbar topBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,7 @@ public class MoreUserProfileActivity extends AppCompatActivity {
         BxtraLogout = findViewById(R.id.profDetails_extralogout);
         BdeleteAcc = findViewById(R.id.deleteAccButton);
         progressBar = findViewById(R.id.PBprofile);
+        topBar = findViewById(R.id.PDtopAppBar);
         nAuthprof = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = nAuthprof.getCurrentUser();
 
@@ -67,6 +71,16 @@ public class MoreUserProfileActivity extends AppCompatActivity {
             onBackPressed();
         });
 
+        topBar.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if(id==R.id.PB_editprofile){
+                Intent intent = new Intent(MoreUserProfileActivity.this,EditProfile.class);
+                startActivity(intent);
+                finish();
+            }
+            return false;
+        });
+
     }
 
     @Override
@@ -81,24 +95,18 @@ public class MoreUserProfileActivity extends AppCompatActivity {
         referenceProfile.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ReadWrite_UserDetails readUserDetails = snapshot.getValue(ReadWrite_UserDetails.class);
-                if(readUserDetails!=null){
 
-                    fname = user.getDisplayName();
-                     Temail = user.getEmail();
-                    usern = readUserDetails.username;
-                      bdate = readUserDetails.bdate;
-                      gender = readUserDetails.gender;
-                    mobile = readUserDetails.mobile;
-
-
-                    textVUsern.setText(usern);
-                    textVFname.setText(fname);
-                       textVEmail.setText(Temail);
-                         textVbdate.setText(bdate);
-                        textVgender.setText(gender);
-
-                }
+                fname = user.getDisplayName();
+                Temail = user.getEmail();
+                usern = snapshot.child("username").getValue().toString();
+                gender = snapshot.child("gender").getValue().toString();
+                bdate = snapshot.child("bdate").getValue().toString();
+                mobile = snapshot.child("mobile").getValue().toString();
+                textVUsern.setText(usern);
+                textVFname.setText(fname);
+                textVEmail.setText(Temail);
+                textVbdate.setText(bdate);
+                textVgender.setText(gender);
                 progressBar.setVisibility(View.GONE);
             }
 
