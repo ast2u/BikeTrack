@@ -19,6 +19,9 @@
         android:theme="@style/Theme.Biketrackcba"
         tools:targetApi="31">
         <activity
+            android:name=".PostActivity"
+            android:exported="false" />
+        <activity
             android:name=".EditProfile"
             android:exported="false" />
         <activity
