@@ -16,6 +16,7 @@ import android.content.Intent;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import android.transition.AutoTransition;
@@ -57,6 +58,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class UserProfileActivity extends AppCompatActivity {
 
     private TextView textVUsern, textVFname,textVbdate, textVgender,textVmobile;
@@ -69,8 +72,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private LinearLayout emergencylayout,emergencylayout2;
 
     private MaterialToolbar topAppbar;
-
-    private LocationUpdaterFirebase locationUpdaterFirebase;
+    private CircleImageView userprofpic;
     private FirebaseAuth nAuthprof;
     @SuppressLint("MissingInflatedId")
     @Override
@@ -81,12 +83,12 @@ public class UserProfileActivity extends AppCompatActivity {
         textVUsern = findViewById(R.id.icd_unameprofile);
         textVFname = findViewById(R.id.icd_nameprofile);
         textEm1 = findViewById(R.id.emContacts1);
+        userprofpic = findViewById(R.id.defaultprofilepic);
         textEm2 = findViewById(R.id.emContacts2);
         topAppbar = findViewById(R.id.topAppBar);
         textVmobile = findViewById(R.id.icd_mobileprofile);
         emergencylayout = findViewById(R.id.edit_errornullemergency);
         emergencylayout2 = findViewById(R.id.show_emergency);
-
         topAppbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if(id==R.id.mLogout){
@@ -222,7 +224,22 @@ public class UserProfileActivity extends AppCompatActivity {
                //     textVbdate.setText(bdate);
                 //    textVgender.setText(gender);
                     textVmobile.setText(mobile);
+                    Uri uri = firebaseUser.getPhotoUrl();
+                    if(uri==null) {
+                        Picasso.get()
+                                .load(R.drawable.userprofilepic)
+                                .into(userprofpic);
+                    }else{
+                        Picasso.get().load(uri).into(userprofpic);
+                    }
+
+                }else{
+                    Toast.makeText(UserProfileActivity.this,"Something went wrong!",
+                            Toast.LENGTH_LONG).show();
                 }
+
+
+
                 if(EMnum1.isEmpty() && EMnum2.isEmpty()) {
                     emergencylayout.setVisibility(View.VISIBLE);
                     emergencylayout2.setVisibility(View.GONE);

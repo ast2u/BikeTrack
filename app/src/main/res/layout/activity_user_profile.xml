@@ -46,16 +46,14 @@
                     android:layout_height="match_parent"
                     android:background="#6F826A"
                     android:orientation="vertical">
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/defaultprofilepic"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_gravity="center"
-
                     android:layout_marginTop="5dp"
                     android:padding="8dp"
-                    android:src="@drawable/userprofilepic"
-                    app:shapeAppearanceOverlay="@drawable/circular_profile_pic" />
+                    />
 
                 <TextView
                     android:id="@+id/icd_unameprofile"

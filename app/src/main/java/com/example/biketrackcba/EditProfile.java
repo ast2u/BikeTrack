@@ -10,16 +10,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
+
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -27,6 +31,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,7 +42,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,6 +56,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditProfile extends AppCompatActivity {
 private TextInputLayout emC1,emC2;
@@ -55,13 +69,16 @@ private String uname, fname, bdate, mobilen,gender;
 private String contactem1, contactem2;
 private DatabaseReference refer;
 private ImageView backButton;
-private ImageView userProfilePic;
+private CircleImageView userProfilePic;
 private static final int REQUEST_CODE_IMAGE_PICKER = 1001;
 
+private String encodedImage;
 private FirebaseAuth nAuth;
 private Button updateButton;
 private FirebaseUser Fuser;
 private ArrayAdapter<CharSequence> adapter;
+private Uri uriImage;
+private StorageReference storageReference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +100,12 @@ private ArrayAdapter<CharSequence> adapter;
         edit_gender = findViewById(R.id.spinner_gender);
         nAuth = FirebaseAuth.getInstance();
         Fuser = nAuth.getCurrentUser();
+        storageReference = FirebaseStorage.getInstance().getReference("Profilepics");
+
+        Uri uri = Fuser.getPhotoUrl();
+
+        Picasso.get().load(uri).into(userProfilePic);
+
 
         if(Fuser==null){
             Toast.makeText(EditProfile.this,"Something went wrong! User's Details " +
@@ -105,29 +128,74 @@ private ArrayAdapter<CharSequence> adapter;
         });
         updateButton.setOnClickListener(view -> {
            UserUpdate();
-
+           pBar.setVisibility(View.VISIBLE);
+           UploadPic();
+            finish();
         });
 
-        userProfilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                pickImageLauncher.launch(intent);
-            }
+        userProfilePic.setOnClickListener(view -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickImageLauncher.launch(intent);
         });
     }
+
+    private void UploadPic() {
+        if(uriImage!=null){
+            //Save the image
+            StorageReference fileref = storageReference.child(nAuth.getCurrentUser().getUid()+"."+
+                    getFileExtension(uriImage));
+            fileref.putFile(uriImage).addOnSuccessListener(taskSnapshot -> {
+                fileref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Uri downloadUri = uri;
+                        Fuser = nAuth.getCurrentUser();
+                        UserProfileChangeRequest profileupdates = new UserProfileChangeRequest.Builder()
+                                .setPhotoUri(downloadUri)
+                                .build();
+                        Fuser.updateProfile(profileupdates);
+                    }
+                });
+                pBar.setVisibility(View.GONE);
+                Toast.makeText(EditProfile.this,"Upload Successful!",Toast.LENGTH_SHORT).show();
+
+                //intent
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(EditProfile.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            Toast.makeText(EditProfile.this,"No File Selected!",Toast.LENGTH_SHORT).show();
+        }
+    }
+    private String getFileExtension(Uri uri){
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_IMAGE_PICKER && resultCode == RESULT_OK && data != null && data.getData() != null) {
+           uriImage = data.getData();
+            userProfilePic.setImageURI(uriImage);
+
+        }
     }
 
     private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    Uri selectedImage = result.getData().getData();
-                    userProfilePic.setImageURI(selectedImage);
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    if(data!=null && data.getData()!=null){
+                        uriImage = data.getData();
+                        userProfilePic.setImageURI(uriImage);
+                    }
                 }
             }
     );
@@ -144,6 +212,14 @@ private ArrayAdapter<CharSequence> adapter;
                 gender = snapshot.child("gender").getValue().toString();
                 contactem1 = snapshot.child("emnumber1").getValue().toString();
                 contactem2 = snapshot.child("emnumber2").getValue().toString();
+                Uri uri = firebaseUser.getPhotoUrl();
+                if(uri==null) {
+                    Picasso.get()
+                            .load(R.drawable.userprofilepic)
+                            .into(userProfilePic);
+                }else{
+                    Picasso.get().load(uri).into(userProfilePic);
+                }
 
                 EditText editFname = edit_fname.getEditText();
                 if (editFname != null) {
@@ -296,14 +372,11 @@ private ArrayAdapter<CharSequence> adapter;
                 Fuser.updateProfile(profileChangeRequest).addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         ReadWrite_UserDetails userDetails = new ReadWrite_UserDetails(new_uname,new_bdate,new_gender,new_mobile,new_em1,new_em2);
-
                         refer.setValue(userDetails).addOnCompleteListener(task1 -> {
-                          //  refer.child("emergencynumber").child("em1").setValue(new_em1);
-                            // refer.child("emergencynumber").child("em2").setValue(new_em2);
                             if(task1.isSuccessful()){
                                 Toast.makeText(EditProfile.this,"Your Profile has been updated.",
-                                        Toast.LENGTH_LONG).show();
-                                finish();
+                                                Toast.LENGTH_LONG).show();
+
                             }else {
                                 Toast.makeText(EditProfile.this, "Something went wrong! Please try again later",
                                         Toast.LENGTH_LONG).show();
@@ -318,7 +391,7 @@ private ArrayAdapter<CharSequence> adapter;
         }else {
             Toast.makeText(EditProfile.this,"Profile has no changes.",
                     Toast.LENGTH_SHORT).show();
-            finish();
+
         }
     }
     private DatePickerDialog datepd;

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MoreUserProfileActivity extends AppCompatActivity {
     private TextView textVUsern, textVFname, textVEmail,textVbdate, textVgender;
@@ -29,7 +33,9 @@ public class MoreUserProfileActivity extends AppCompatActivity {
     private MaterialToolbar topAppbar;
     private Button BxtraLogout, BdeleteAcc;
     private FirebaseAuth nAuthprof;
+    private CircleImageView moreuserprofpic;
     private MaterialToolbar topBar;
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +46,14 @@ public class MoreUserProfileActivity extends AppCompatActivity {
         textVFname = findViewById(R.id.text_fullname);
         textVEmail = findViewById(R.id.text_email);
         textVbdate = findViewById(R.id.text_bdate);
+        moreuserprofpic = findViewById(R.id.moreprofilepic);
         textVgender = findViewById(R.id.text_gender);
         BxtraLogout = findViewById(R.id.profDetails_extralogout);
         BdeleteAcc = findViewById(R.id.deleteAccButton);
         progressBar = findViewById(R.id.PBprofile);
         topBar = findViewById(R.id.PDtopAppBar);
         nAuthprof = FirebaseAuth.getInstance();
-        FirebaseUser firebaseUser = nAuthprof.getCurrentUser();
+       firebaseUser = nAuthprof.getCurrentUser();
 
         if(firebaseUser==null){
             Toast.makeText(MoreUserProfileActivity.this,"Something went wrong! User's Details " +
@@ -107,6 +114,15 @@ public class MoreUserProfileActivity extends AppCompatActivity {
                 textVEmail.setText(Temail);
                 textVbdate.setText(bdate);
                 textVgender.setText(gender);
+                Uri uri = user.getPhotoUrl();
+                if(uri==null) {
+                    Picasso.get()
+                            .load(R.drawable.userprofilepic)
+                            .into(moreuserprofpic);
+                }else{
+                    Picasso.get().load(uri).into(moreuserprofpic);
+                }
+
                 progressBar.setVisibility(View.GONE);
             }
 
