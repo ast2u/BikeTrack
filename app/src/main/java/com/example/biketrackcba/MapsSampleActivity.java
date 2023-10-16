@@ -15,10 +15,10 @@ import android.Manifest;
 import com.firebase.geofire.GeoFire;
 
 
-
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.Priority;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,11 +44,14 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.android.PolyUtil;
+import com.google.maps.android.SphericalUtil;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
@@ -63,6 +67,8 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -70,6 +76,8 @@ import android.os.Handler;
 import android.os.Looper;
 ;
 import android.os.PowerManager;
+import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -88,6 +96,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -132,12 +141,15 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Ref;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 
+import java.util.Date;
 import java.util.List;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -145,7 +157,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1000;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
-    private ProgressBar progressBar,sosProgressBar;
+    private ProgressBar progressBar, sosProgressBar;
     private ValueEventListener valueEventListener;
     private GoogleMap mMap;
 
@@ -181,18 +193,17 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private FirebaseUser user;
     private FirebaseDatabase database;
     private TimerService timerService;
-    private DatabaseReference otherUsersRef,refUserSignal;
+    private DatabaseReference otherUsersRef, refUserSignal;
     MediaPlayer sosMediaplayer;
     private String currentUserId;
     private LocationUpdaterFirebase locationUpdaterFirebase;
     private SosAlertSignal sosAlertSignal;
     private List<LatLng> routePoints = new ArrayList<>();
-    private Button startBDialog,continueBDialog,cancelBDialog,startSaveRoute,cancelSaveRoute;
+    private Button startBDialog, continueBDialog, cancelBDialog, startSaveRoute, cancelSaveRoute;
     private Button finalstartSaveRoute, finalcancelSaveRoute;
     private EditText title_Route, desc_Route;
     private TextView saveDialogText;
     private CheckBox routeprivacy;
-
 
 
     @Override
@@ -213,7 +224,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         mapFragment.getMapAsync(this);
         LocationUtils.checkLocationSettings(this);
         locationUpdaterFirebase = new LocationUpdaterFirebase(this);
-        sosMediaplayer = MediaPlayer.create(this,R.raw.sos_sound);
+        sosMediaplayer = MediaPlayer.create(this, R.raw.sos_sound);
 
         text_Time = findViewById(R.id.D_time_text);
         timerService = new TimerService(new Handler(Looper.getMainLooper()), text_Time);
@@ -284,10 +295,10 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         sos_button.setOnClickListener(view -> {
             SosStarted();
             //Temporary
-          //  menuItem.setEnabled(false);
-          //  menuItem1.setEnabled(false);
-          //  menuItem3.setEnabled(false);
-           // menuItem4.setEnabled(false);
+            //  menuItem.setEnabled(false);
+            //  menuItem1.setEnabled(false);
+            //  menuItem3.setEnabled(false);
+            // menuItem4.setEnabled(false);
 
             //
 
@@ -315,8 +326,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 layoutD_startRouting2.setVisibility(View.GONE);
                 button_StartRTrack.setVisibility(View.VISIBLE);
             }
-            if(startRoutePoints==true){
-                startRoutePoints=false;
+            if (startRoutePoints == true) {
+                startRoutePoints = false;
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(mMap.getCameraPosition().target) // Keep the same target position
                         .zoom(mMap.getCameraPosition().zoom) // Keep the same zoom level
@@ -357,9 +368,11 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             }
         });
     }
+
     private boolean isSosStarted = false;
-    private void SosStarted (){
-        if(!isSosStarted) {
+
+    private void SosStarted() {
+        if (!isSosStarted) {
             sosProgressBar.setVisibility(View.VISIBLE);
             RcardView.setVisibility(View.GONE);
             sViewB.setVisibility(View.GONE);
@@ -373,7 +386,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
             startBDialog.findViewById(R.id.dialogButtonDone).setOnClickListener(view1 -> {
                 alertDialog.dismiss();
-                Toast.makeText(this,"You won't be able to navigate to other menu",Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "You won't be able to navigate to other menu", Toast.LENGTH_LONG).show();
                 playSOSsound();
                 locationUpdaterFirebase.stopLocationFirebaseUpdates();
                 sosAlertSignal = new SosAlertSignal(this);
@@ -385,6 +398,26 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 AlertDialog alertDialog2 = builder2.create();
                 continueBDialog.findViewById(R.id.dialogContinueDone).setOnClickListener(view2 -> {
                     alertDialog2.dismiss();
+
+                    FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        fusedLocationClient.getLastLocation()
+                                .addOnSuccessListener(this, location -> {
+                                    if (location != null) {
+                                        double latitude = location.getLatitude();
+                                        double longitude = location.getLongitude();
+
+                                        // Use latitude and longitude to compose the message
+                                        String message = "SOS! I need help! Automated Message from BikeTrack Application" +
+                                                "\nCheck out my location on Google Maps: " +
+                                                "https://maps.google.com/?q=" + latitude + "," + longitude;
+
+                                        // Now you can send this message using your preferred method (e.g., SMS, chat app, etc.)
+                                        sendSmsIfSignalAvailable(message);
+                                    }
+                                });
+                    }
                 });
                 alertDialog2.show();
 
@@ -397,16 +430,90 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             }
             alertDialog.show();
-        }else{
+        } else {
             sosProgressBar.setVisibility(View.GONE);
             RcardView.setVisibility(View.VISIBLE);
             sViewB.setVisibility(View.VISIBLE);
             stopSOSsound();
             sosAlertSignal.stopSosUpdates();
-            locationUpdaterFirebase.startLocationFirebaseUpdates(this);
+            locationUpdaterFirebase = new LocationUpdaterFirebase(this);
 
         }
-        isSosStarted=!isSosStarted;
+        isSosStarted = !isSosStarted;
+    }
+
+    private void sendSmsIfSignalAvailable(String message) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        boolean isNetworkAvailable = networkInfo != null && networkInfo.isConnectedOrConnecting();
+
+        if (isNetworkAvailable) {
+            // Internet is available, send SMS immediately
+            sendSms(message);
+        } else {
+            // No internet, check for cellular signal
+            boolean isCellularSignalAvailable = isCellularSignalAvailable();
+
+            if (isCellularSignalAvailable) {
+                // Queue the SMS for later sending
+                queueSmsForSendingLater(message);
+            } else {
+                // No signal, inform the user or take appropriate action
+                Toast.makeText(this, "No cellular signal available.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private boolean isCellularSignalAvailable() {
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+
+            return false;
+        }
+        return telephonyManager.getNetworkType() != TelephonyManager.NETWORK_TYPE_UNKNOWN;
+    }
+
+    private void queueSmsForSendingLater(String message) {
+        // Implement logic to store the SMS message and send it when signal is available
+        // This could involve saving it to a database, SharedPreferences, or some other storage mechanism.
+    }
+
+
+    private void sendSms(String message){
+        String userId = user.getUid();
+        SmsPermissionHelper.requestSendSmsPermission(this);
+        boolean isPermissionGranted = SmsPermissionHelper.isSendSmsPermissionGranted(this);
+        if(isPermissionGranted){
+
+        DatabaseReference userref = FirebaseDatabase.getInstance().getReference("Registered Users");
+        userref.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String number1 = snapshot.child("emnumber1").getValue().toString();
+                if (number1.startsWith("0")) {
+                    number1 = "+63" + number1.substring(1);
+                }
+                Log.d(TAG, "Mynumber: "+number1);
+                try {
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(number1,null,message,null,null);
+                    Toast.makeText(MapsSampleActivity.this, "SMS sent successfully.", Toast.LENGTH_SHORT).show();
+                }catch (Exception e){
+                    Toast.makeText(MapsSampleActivity.this, "Failed to send SMS.", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MapsSampleActivity.this,"Something went wrong!",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+        }else{
+            Toast.makeText(MapsSampleActivity.this, "Please Allow to send SMS.", Toast.LENGTH_SHORT).show();
+        }
+
     }
     private void toggleSearchView() {
         if (sView.getVisibility() == View.VISIBLE) {
@@ -715,50 +822,38 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             routeprivacy = vC2.findViewById(R.id.route_privacy);
             title_Route = vC2.findViewById(R.id.title_edit_Route);
             desc_Route = vC2.findViewById(R.id.desc_edit_Route);
-            finalstartSaveRoute.findViewById(R.id.buttonSaveAction2).setOnClickListener(view2 ->{
+            finalstartSaveRoute.findViewById(R.id.buttonSaveAction2).setOnClickListener(view2 -> {
                 dialog2.dismiss();
                 String titleR = title_Route.getText().toString();
                 String descR = desc_Route.getText().toString();
+                boolean privacyR = routeprivacy.isChecked();
 
-                //DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
-                //String routeId = routesref.push().getKey();
-              //  routesref.child("points").setValue(routePoints);
-              //  routesref.child("title").setValue(titleR);
-              //  routesref.child("desc").setValue(descR);
-                LatLng midpoint = calculateMidpoint(routePoints);
-                String encodedPolyline = PolyUtil.encode(routePoints);
-                LatLng startPoint = routePoints.get(0);
-                LatLng endPoint = routePoints.get(routePoints.size() - 1);
-
-
+                if (titleR.isEmpty()) {
+                    Toast.makeText(this, "Please enter a title for the Route", Toast.LENGTH_LONG).show();
+                    title_Route.setError("Title is required");
+                    title_Route.requestFocus();
+                } else {
+                    LatLng midpoint = calculateMidpoint(routePoints);
+                    String encodedPolyline = PolyUtil.encode(routePoints);
+                    LatLng startPoint = routePoints.get(0);
+                    LatLng endPoint = routePoints.get(routePoints.size() - 1);
                 String staticMapUrl = "https://maps.googleapis.com/maps/api/staticmap" +
                         "?size=600x400" + // Set the size of the image
-                        "&center="+ midpoint.latitude + "," + midpoint.longitude + // Set the center of the map
-                        "&zoom=16"+
+                        "&center=" + midpoint.latitude + "," + midpoint.longitude + // Set the center of the map
+                        "&zoom=16" +
                         "&markers=color:green|" + startPoint.latitude + "," + startPoint.longitude +
-                        "&markers=color:blue|" + endPoint.latitude + "," + endPoint.longitude +
+                        "&markers=color:red|" + endPoint.latitude + "," + endPoint.longitude +
                         "&path=color:0x00ff00|weight:4|enc:" + encodedPolyline +
                         "&key=AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8"; // Replace with your actual API Key
 
-                downloadImageInBackground(staticMapUrl,currentUserId,titleR,descR);
+                downloadImageInBackground(staticMapUrl, currentUserId, titleR, descR, privacyR, String.valueOf(startPoint));
 
-                for (Polyline polyline : routePolyline){
+                for (Polyline polyline : routePolyline) {
                     polyline.remove();
                 }
                 routePolyline.clear();
                 routePoints.clear();
-
-                /*
-                  routesref.child(routeId).child("title").setValue(titleR);
-               routesref.child(routeId).child("desc").setValue(descR);
-               Toast.makeText(this,"Route saved succesfully",Toast.LENGTH_SHORT).show();
-
-                for (Polyline polyline : routePolyline){
-                    polyline.remove();
-                }
-                routePolyline.clear();
-                routePoints.clear();
-                 */
+            }
             });
 
             finalcancelSaveRoute.findViewById(R.id.buttonCancelAction2).setOnClickListener(view2 ->{
@@ -786,36 +881,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         }
         alertDSave.show();
 
-
-        /*
-        AlertDialog.Builder Abuilder = new AlertDialog.Builder(this);
-        Abuilder.setTitle("Save Route");
-        Abuilder.setMessage("Do you want to save the route?");
-
-        Abuilder.setPositiveButton("Save", (dialogInterface, i) -> {
-            dialogInterface.dismiss();
-            DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
-            String routeId = routesref.push().getKey();
-            routesref.child(routeId).child("points").setValue(routePoints);
-            Toast.makeText(this,"Route saved succesfully",Toast.LENGTH_SHORT).show();
-            for (Polyline polyline : routePolyline){
-                polyline.remove();
-            }
-            routePolyline.clear();
-            routePoints.clear();
-        });
-        Abuilder.setNegativeButton("Cancel", (dialogInterface, i) -> {
-            dialogInterface.dismiss();
-            for (Polyline polyline : routePolyline){
-                polyline.remove();
-            }
-            routePolyline.clear();
-            routePoints.clear();
-        });
-        AlertDialog dialog = Abuilder.create();
-        dialog.show();
-
-         */
     }
 
     private LatLng calculateMidpoint(List<LatLng> points) {
@@ -832,7 +897,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         return new LatLng(avgLat, avgLng);
     }
-    private void downloadImageInBackground(String imageUrl, String currentUserId,String title,String desc) {
+    private void downloadImageInBackground(String imageUrl, String currentUserId,String title,String desc,boolean privacyR,String startP) {
         new Thread(() -> {
             try {
                 URL url = new URL(imageUrl);
@@ -850,6 +915,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 byte[] result = byteArrayOutputStream.toByteArray();
                 DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
                 String routeId = routesref.push().getKey();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy", Locale.getDefault());
+                String currentDate = dateFormat.format(new Date());
                 // Upload image to Firebase Storage
                 StorageReference storageRef = FirebaseStorage.getInstance().getReference();
                 StorageReference mapRef = storageRef.child("maps").child(currentUserId).child(routeId+"_route_map.jpg");
@@ -861,12 +928,15 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                         // Save the URL in Realtime Database
 
                         routesref.child(routeId).child("imageUrl").setValue(imageUrlFirebase);
+                        routesref.child(routeId).child("dateCreated").setValue(currentDate);
+                        routesref.child(routeId).child("private").setValue(privacyR);
+                        routesref.child(routeId).child("startPoint").setValue(startP);
                         routesref.child(routeId).child("title").setValue(title);
                         routesref.child(routeId).child("desc").setValue(desc);
 
                         // Use the result (image byte array) here
 
-                        Toast.makeText(this,"Uploaded successfully! ", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"Route uploaded/save successfully! ", Toast.LENGTH_LONG).show();
                     });
                 }).addOnFailureListener(exception -> {
                     Toast.makeText(this,"Failed to save/create route points", Toast.LENGTH_LONG).show();
@@ -929,7 +999,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                         //mMap.getUiSettings().setAllGesturesEnabled(false);
                        // mMap.getUiSettings().setRotateGesturesEnabled(true);
                     }
-
+                    if(isSosStarted==false) {
+                        checkMarkersProximity(location);
+                    }
 
                     if (shouldAutoCenterCamera) {
 
@@ -989,6 +1061,23 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     Looper.getMainLooper());
         }
     }
+    private void checkMarkersProximity(Location userLocation){
+        for (Marker marker : otherUserSignalMarker) {
+            Location markerLocation = new Location("");
+            markerLocation.setLatitude(marker.getPosition().latitude);
+            markerLocation.setLongitude(marker.getPosition().longitude);
+
+            float distance = userLocation.distanceTo(markerLocation);
+
+            if (distance < 1000) { // Adjust the proximity threshold as needed
+                showSnackbar("There's a marker nearby!");
+                return; // Stop checking once a nearby marker is found
+            }
+        }
+    }
+    private void showSnackbar(String message) {
+        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+    }
 
     private void stopDirections() {
         stopDirectionsThread();
@@ -1009,7 +1098,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         mMap.getUiSettings().setAllGesturesEnabled(true);
     }
-
+/*
     private Location smoothLocationUpdate(Location newLocation) {
         if (prevDestinationLocatiom == null) {
             return newLocation;
@@ -1025,7 +1114,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         return smoothedLocation;
     }
-
+ */
 
 
     private void centerMapOnUserLocation(){
@@ -1115,11 +1204,10 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                         .position(userLocation)
                                         .title(username)
                                         .snippet(timeandTxt);
-
                                 Marker marker = mMap.addMarker(markerOptions);
                                 marker.setTag(marker);
-                                
                                 otherUserSignalMarker.add(marker);
+
                             }
                         }
                         @Override
@@ -1193,6 +1281,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     }
 
      */
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
@@ -1201,9 +1290,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
-
+            mMap.setInfoWindowAdapter(new InfoWindowAdapter(MapsSampleActivity.this));
             drawOtherUsersMarker();
-
 
             mMap.setOnCameraMoveListener(() -> {
                 float zoomLevel = mMap.getCameraPosition().zoom;
@@ -1219,6 +1307,15 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             });
 
         }
+/*
+        mMap.setOnMarkerClickListener(marker -> {
+            if(otherUserSignalMarker.contains(marker)){
+                marker.showInfoWindow();
+            }
+            return true;
+        });
+
+ */
 
 }
     public void playSOSsound(){

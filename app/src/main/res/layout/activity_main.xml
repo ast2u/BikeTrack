@@ -20,16 +20,16 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="270dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/logoapp" />
+            android:src="@drawable/logoremastered2" />
 
         <TextView
             android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:text="Welcome to BikeTrack"
+            android:text="Welcome To BikeTrack"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="30sp"

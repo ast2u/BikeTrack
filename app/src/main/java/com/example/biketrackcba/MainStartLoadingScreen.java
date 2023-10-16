@@ -16,23 +16,20 @@ public class MainStartLoadingScreen extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main_start_loading_screen);
 
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // on below line we are
-                // creating a new intent
-                Intent i = new Intent(MainStartLoadingScreen.this, Loginstarter.class);
+                        Intent i = new Intent(MainStartLoadingScreen.this, Loginstarter.class);
 
-                // on below line we are
-                // starting a new activity.
-                startActivity(i);
 
-                // on the below line we are finishing
-                // our current activity.
-                finish();
-            }
-        }, 2000);
+                        startActivity(i);
 
+                        finish();
+
+                        SmsPermissionHelper.requestSendSmsPermission(MainStartLoadingScreen.this);
+
+                }
+            }, 2000);
     }
 }

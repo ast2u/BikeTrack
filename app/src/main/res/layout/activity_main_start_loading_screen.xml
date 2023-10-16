@@ -5,7 +5,7 @@
     android:id="@+id/idRLContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/greenish"
+    android:background="@color/greendark"
     android:orientation="vertical"
     tools:context=".MainStartLoadingScreen">
 
@@ -13,33 +13,22 @@
     <ImageView
         android:id="@+id/idIVLogo"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="230dp"
         android:layout_centerInParent="true"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="3dp"
-        android:src="@drawable/logoapp" />
 
-    <TextView
-        android:id="@+id/logoname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/idIVLogo"
-        android:layout_centerHorizontal="true"
+        android:src="@drawable/logoremastered" />
 
-        android:fontFamily="@font/contrail_one"
-        android:text="BikeTrack"
-        android:textColor="@color/black"
-        android:textSize="55sp"
-        android:textStyle="bold" />
+
 
     <!--on below line we are creating progress bar-->
     <ProgressBar
         android:id="@+id/idPBLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/logoname"
+        android:layout_below="@id/idIVLogo"
         android:layout_marginTop="12dp"
         android:layout_centerInParent="true"
         android:indeterminateTint="@color/white" />

@@ -161,7 +161,8 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                     Intent intent = new Intent(LoginUserEmailActivity.this, MapsSampleActivity.class);
                     //Intent intent = new Intent(Intent.ACTION_MAIN);
                     //intent.addCategory(Intent.CATEGORY_APP_EMAIL);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     /*
                     if(firebaseUser.isEmailVerified()){

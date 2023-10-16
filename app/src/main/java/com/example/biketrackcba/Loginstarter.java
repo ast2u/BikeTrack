@@ -25,7 +25,7 @@ private FirebaseAuth nAuth;
             lgEmail.setOnClickListener(view -> {
                 Intent intnext = new Intent(Loginstarter.this, LoginUserEmailActivity.class);
                 startActivity(intnext);
-                finish();
+
 
             });
         }else{
