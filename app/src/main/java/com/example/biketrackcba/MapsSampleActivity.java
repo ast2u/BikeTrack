@@ -37,9 +37,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
+import com.google.maps.android.PolyUtil;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 
@@ -60,6 +63,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -82,6 +86,7 @@ import android.view.animation.AnimationUtils;
 
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -121,6 +126,11 @@ import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -181,6 +191,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private Button finalstartSaveRoute, finalcancelSaveRoute;
     private EditText title_Route, desc_Route;
     private TextView saveDialogText;
+    private CheckBox routeprivacy;
 
 
 
@@ -701,6 +712,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             dialog2.show();
             finalstartSaveRoute = vC2.findViewById(R.id.buttonSaveAction2);
             finalcancelSaveRoute = vC2.findViewById(R.id.buttonCancelAction2);
+            routeprivacy = vC2.findViewById(R.id.route_privacy);
             title_Route = vC2.findViewById(R.id.title_edit_Route);
             desc_Route = vC2.findViewById(R.id.desc_edit_Route);
             finalstartSaveRoute.findViewById(R.id.buttonSaveAction2).setOnClickListener(view2 ->{
@@ -708,16 +720,27 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 String titleR = title_Route.getText().toString();
                 String descR = desc_Route.getText().toString();
 
-
-                DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
+                //DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
                 //String routeId = routesref.push().getKey();
-               // routesref.child(routeId).child("points").setValue(routePoints);
-               // routesref.child(routeId).child("title").setValue(titleR);
-               // routesref.child(routeId).child("desc").setValue(descR);
-                routesref.child("points").setValue(routePoints);
-                routesref.child("title").setValue(titleR);
-                routesref.child("desc").setValue(descR);
-                Toast.makeText(this,"Route saved succesfully",Toast.LENGTH_SHORT).show();
+              //  routesref.child("points").setValue(routePoints);
+              //  routesref.child("title").setValue(titleR);
+              //  routesref.child("desc").setValue(descR);
+                LatLng midpoint = calculateMidpoint(routePoints);
+                String encodedPolyline = PolyUtil.encode(routePoints);
+                LatLng startPoint = routePoints.get(0);
+                LatLng endPoint = routePoints.get(routePoints.size() - 1);
+
+
+                String staticMapUrl = "https://maps.googleapis.com/maps/api/staticmap" +
+                        "?size=600x400" + // Set the size of the image
+                        "&center="+ midpoint.latitude + "," + midpoint.longitude + // Set the center of the map
+                        "&zoom=16"+
+                        "&markers=color:green|" + startPoint.latitude + "," + startPoint.longitude +
+                        "&markers=color:blue|" + endPoint.latitude + "," + endPoint.longitude +
+                        "&path=color:0x00ff00|weight:4|enc:" + encodedPolyline +
+                        "&key=AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8"; // Replace with your actual API Key
+
+                downloadImageInBackground(staticMapUrl,currentUserId,titleR,descR);
 
                 for (Polyline polyline : routePolyline){
                     polyline.remove();
@@ -725,6 +748,17 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 routePolyline.clear();
                 routePoints.clear();
 
+                /*
+                  routesref.child(routeId).child("title").setValue(titleR);
+               routesref.child(routeId).child("desc").setValue(descR);
+               Toast.makeText(this,"Route saved succesfully",Toast.LENGTH_SHORT).show();
+
+                for (Polyline polyline : routePolyline){
+                    polyline.remove();
+                }
+                routePolyline.clear();
+                routePoints.clear();
+                 */
             });
 
             finalcancelSaveRoute.findViewById(R.id.buttonCancelAction2).setOnClickListener(view2 ->{
@@ -783,6 +817,68 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
          */
     }
+
+    private LatLng calculateMidpoint(List<LatLng> points) {
+        double totalLat = 0;
+        double totalLng = 0;
+
+        for (LatLng point : points) {
+            totalLat += point.latitude;
+            totalLng += point.longitude;
+        }
+
+        double avgLat = totalLat / points.size();
+        double avgLng = totalLng / points.size();
+
+        return new LatLng(avgLat, avgLng);
+    }
+    private void downloadImageInBackground(String imageUrl, String currentUserId,String title,String desc) {
+        new Thread(() -> {
+            try {
+                URL url = new URL(imageUrl);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                InputStream inputStream = connection.getInputStream();
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    byteArrayOutputStream.write(buffer, 0, bytesRead);
+                }
+
+                byte[] result = byteArrayOutputStream.toByteArray();
+                DatabaseReference routesref = FirebaseDatabase.getInstance().getReference("Routes").child(currentUserId);
+                String routeId = routesref.push().getKey();
+                // Upload image to Firebase Storage
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                StorageReference mapRef = storageRef.child("maps").child(currentUserId).child(routeId+"_route_map.jpg");
+
+                mapRef.putBytes(result).addOnSuccessListener(taskSnapshot -> {
+                    mapRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String imageUrlFirebase = uri.toString();
+
+                        // Save the URL in Realtime Database
+
+                        routesref.child(routeId).child("imageUrl").setValue(imageUrlFirebase);
+                        routesref.child(routeId).child("title").setValue(title);
+                        routesref.child(routeId).child("desc").setValue(desc);
+
+                        // Use the result (image byte array) here
+
+                        Toast.makeText(this,"Uploaded successfully! ", Toast.LENGTH_LONG).show();
+                    });
+                }).addOnFailureListener(exception -> {
+                    Toast.makeText(this,"Failed to save/create route points", Toast.LENGTH_LONG).show();
+                });
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+
 
     private boolean shouldAutoCenterCamera = true;
     private boolean startRoutePoints = false;
@@ -891,12 +987,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             fusedLocationClient.requestLocationUpdates(locationRequest,
                     locationCallback,
                     Looper.getMainLooper());
-
         }
-
-
     }
-
 
     private void stopDirections() {
         stopDirectionsThread();
@@ -934,25 +1026,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         return smoothedLocation;
     }
 
-
-
-
-    /*
-
-    // Sample Interpolate
-    private Location interpolateLocation(Location start, Location end, long elapsedTime) {
-        double fraction = (double) elapsedTime / (end.getTime() - start.getTime());
-        double lat = start.getLatitude() + (end.getLatitude() - start.getLatitude()) * fraction;
-        double lng = start.getLongitude() + (end.getLongitude() - start.getLongitude()) * fraction;
-
-        Location interpolatedLocation = new Location("interpolated");
-        interpolatedLocation.setLatitude(lat);
-        interpolatedLocation.setLongitude(lng);
-
-        return interpolatedLocation;
-    }
-
-     */
 
 
     private void centerMapOnUserLocation(){
@@ -1120,8 +1193,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     }
 
      */
-
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
