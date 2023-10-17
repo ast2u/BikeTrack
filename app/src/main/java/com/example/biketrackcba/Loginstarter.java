@@ -50,8 +50,6 @@ private FirebaseAuth nAuth;
                 //START
                 startActivity(new Intent(Loginstarter.this, MapsSampleActivity.class));
                 finish();
-            } else {
-                Toast.makeText(this, "You can login now!", Toast.LENGTH_SHORT).show();
             }
         }else{
             NetworkUtils.showNoInternetDialog(this);

@@ -90,8 +90,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
 import android.view.animation.AnimationUtils;
-
-
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -133,6 +131,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.EncodedPolyline;
+
 
 
 import java.io.ByteArrayOutputStream;
@@ -204,6 +203,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private EditText title_Route, desc_Route;
     private TextView saveDialogText;
     private CheckBox routeprivacy;
+    private MenuItem menuItem,menuItem1,menuItem2,menuItem3,menuItem4;
 
 
     @Override
@@ -239,8 +239,12 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         RcardView = findViewById(R.id.routing_CardView);
         layoutD_startRouting2 = findViewById(R.id.layoutstart_routing);
+        Intent intentfromotheractivity = getIntent();
+        boolean showSnackbar = intentfromotheractivity.getBooleanExtra("showSnackbar", false);
 
-
+        if (showSnackbar) {
+            Snackbar.make(findViewById(android.R.id.content), "Start the SOS in Maps menu!", Snackbar.LENGTH_LONG).show();
+        }
         layoutDestination = findViewById(R.id.mDestination_starter);
 
         text_Speed = findViewById(R.id.D_speed_text);
@@ -281,11 +285,11 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         bottomNavigationView = findViewById(R.id.bottomNavView);
         Menu menu = bottomNavigationView.getMenu();
         bottomNavigationView.setSelectedItemId(R.id.miHome);
-        MenuItem menuItem = menu.getItem(0);
-        MenuItem menuItem1 = menu.getItem(1);
-        MenuItem menuItem2 = menu.getItem(2);
-        MenuItem menuItem3 = menu.getItem(3);
-        MenuItem menuItem4 = menu.getItem(4);
+        menuItem = menu.getItem(0);
+        menuItem1 = menu.getItem(1);
+        menuItem2 = menu.getItem(2);
+        menuItem3 = menu.getItem(3);
+        menuItem4 = menu.getItem(4);
 
         menuItem2.setEnabled(false);
         sViewB = findViewById(R.id.mSearch_butt);
@@ -294,13 +298,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         sos_button.setOnClickListener(view -> {
             SosStarted();
-            //Temporary
-            //  menuItem.setEnabled(false);
-            //  menuItem1.setEnabled(false);
-            //  menuItem3.setEnabled(false);
-            // menuItem4.setEnabled(false);
-
-            //
 
 
         });
@@ -352,7 +349,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.miHome) {
-                    overridePendingTransition(0, 0);
+                   // Something to do here
                 } else if (id == R.id.miSocials) {
                     Intent intent = new Intent(MapsSampleActivity.this, UserSocialsActivity.class);
                     startActivity(intent);
@@ -371,7 +368,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
     private boolean isSosStarted = false;
 
-    private void SosStarted() {
+    public void SosStarted() {
         if (!isSosStarted) {
             sosProgressBar.setVisibility(View.VISIBLE);
             RcardView.setVisibility(View.GONE);
@@ -385,8 +382,12 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             final AlertDialog alertDialog = builder.create();
 
             startBDialog.findViewById(R.id.dialogButtonDone).setOnClickListener(view1 -> {
+                menuItem.setEnabled(false);
+                menuItem1.setEnabled(false);
+                menuItem3.setEnabled(false);
+                menuItem4.setEnabled(false);
                 alertDialog.dismiss();
-                Toast.makeText(this, "You won't be able to navigate to other menu", Toast.LENGTH_LONG).show();
+                Snackbar.make(findViewById(android.R.id.content), "You won't be able to navigate to other menu", Snackbar.LENGTH_LONG).show();
                 playSOSsound();
                 locationUpdaterFirebase.stopLocationFirebaseUpdates();
                 sosAlertSignal = new SosAlertSignal(this);
@@ -399,6 +400,16 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 continueBDialog.findViewById(R.id.dialogContinueDone).setOnClickListener(view2 -> {
                     alertDialog2.dismiss();
 
+                    if(ContextCompat.checkSelfPermission(MapsSampleActivity.this, Manifest.permission.SEND_SMS)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        sendSms();
+                    }else{
+                        ActivityCompat.requestPermissions(MapsSampleActivity.this,
+                                new String[]{Manifest.permission.SEND_SMS},100);
+                    }
+
+
+                    /*
                     FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
@@ -412,12 +423,12 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                                         String message = "SOS! I need help! Automated Message from BikeTrack Application" +
                                                 "\nCheck out my location on Google Maps: " +
                                                 "https://maps.google.com/?q=" + latitude + "," + longitude;
+                                        //sendSmsIfSignalAvailable(message);
 
-                                        // Now you can send this message using your preferred method (e.g., SMS, chat app, etc.)
-                                        sendSmsIfSignalAvailable(message);
                                     }
                                 });
                     }
+                    */
                 });
                 alertDialog2.show();
 
@@ -434,7 +445,12 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
             sosProgressBar.setVisibility(View.GONE);
             RcardView.setVisibility(View.VISIBLE);
             sViewB.setVisibility(View.VISIBLE);
+            menuItem.setEnabled(true);
+            menuItem1.setEnabled(true);
+            menuItem3.setEnabled(true);
+            menuItem4.setEnabled(true);
             stopSOSsound();
+
             sosAlertSignal.stopSosUpdates();
             locationUpdaterFirebase = new LocationUpdaterFirebase(this);
 
@@ -450,8 +466,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         if (isNetworkAvailable) {
             // Internet is available, send SMS immediately
-            sendSms(message);
+            sendSms();
         } else {
+            /*
             // No internet, check for cellular signal
             boolean isCellularSignalAvailable = isCellularSignalAvailable();
 
@@ -462,6 +479,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 // No signal, inform the user or take appropriate action
                 Toast.makeText(this, "No cellular signal available.", Toast.LENGTH_SHORT).show();
             }
+
+             */
         }
     }
 
@@ -480,29 +499,41 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     }
 
 
-    private void sendSms(String message){
+    private void sendSms(){
         String userId = user.getUid();
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null) {
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+
+                            // Use latitude and longitude to compose the message
+                            String message = "SOS! I need help!" +
+                                    "\nCheck out my location on Google Maps: " +
+                                    "https://maps.google.com/?q=" + latitude + "," + longitude;
+                            //sendSmsIfSignalAvailable(message);
+
+
         SmsPermissionHelper.requestSendSmsPermission(this);
         boolean isPermissionGranted = SmsPermissionHelper.isSendSmsPermissionGranted(this);
         if(isPermissionGranted){
-
         DatabaseReference userref = FirebaseDatabase.getInstance().getReference("Registered Users");
         userref.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String number1 = snapshot.child("emnumber1").getValue().toString();
+
                 if (number1.startsWith("0")) {
                     number1 = "+63" + number1.substring(1);
                 }
-                Log.d(TAG, "Mynumber: "+number1);
-                try {
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(number1,null,message,null,null);
                     Toast.makeText(MapsSampleActivity.this, "SMS sent successfully.", Toast.LENGTH_SHORT).show();
-                }catch (Exception e){
-                    Toast.makeText(MapsSampleActivity.this, "Failed to send SMS.", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
+
+
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -512,6 +543,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         });
         }else{
             Toast.makeText(MapsSampleActivity.this, "Please Allow to send SMS.", Toast.LENGTH_SHORT).show();
+        }
+                        }
+                    });
         }
 
     }
@@ -761,7 +795,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.
                         ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -777,6 +810,12 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 Toast.makeText(getApplicationContext(), "Location Permission Access must be enabled!", Toast.LENGTH_LONG).show();
                 // You might want to show a message to the user or handle this case differently
             }
+        }
+
+        if(requestCode == 100 && grantResults.length>0&& grantResults[0]==PackageManager.PERMISSION_GRANTED){
+            sendSms();
+        }else{
+            Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -897,7 +936,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         return new LatLng(avgLat, avgLng);
     }
-    private void downloadImageInBackground(String imageUrl, String currentUserId,String title,String desc,boolean privacyR,String startP) {
+    private void downloadImageInBackground(String imageUrl, String currentUserId,
+                                           String title,String desc,boolean privacyR,String startP) {
         new Thread(() -> {
             try {
                 URL url = new URL(imageUrl);
@@ -925,8 +965,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     mapRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         String imageUrlFirebase = uri.toString();
 
-                        // Save the URL in Realtime Database
 
+                        // Save the URL in Realtime Database
+                        routesref.child(routeId).child("imageUrl").setValue(imageUrlFirebase);
                         routesref.child(routeId).child("imageUrl").setValue(imageUrlFirebase);
                         routesref.child(routeId).child("dateCreated").setValue(currentDate);
                         routesref.child(routeId).child("private").setValue(privacyR);
@@ -1050,7 +1091,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         };
 
         LocationRequest locationRequest = new LocationRequest.Builder
-                (Priority.PRIORITY_HIGH_ACCURACY, 1000)
+                (Priority.PRIORITY_BALANCED_POWER_ACCURACY, 1000)
                 .build();
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)

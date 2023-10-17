@@ -40,6 +40,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -70,7 +72,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private String EMnum1, EMnum2;
     private BottomNavigationView bottomNavigationView;
     private LinearLayout emergencylayout,emergencylayout2;
-
+    private FloatingActionButton fab_sos;
     private MaterialToolbar topAppbar;
     private CircleImageView userprofpic;
     private FirebaseAuth nAuthprof;
@@ -82,6 +84,7 @@ public class UserProfileActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBarprofile);
         textVUsern = findViewById(R.id.icd_unameprofile);
         textVFname = findViewById(R.id.icd_nameprofile);
+        fab_sos = findViewById(R.id.start_sosButton);
         textEm1 = findViewById(R.id.emContacts1);
         userprofpic = findViewById(R.id.defaultprofilepic);
         textEm2 = findViewById(R.id.emContacts2);
@@ -110,7 +113,14 @@ public class UserProfileActivity extends AppCompatActivity {
             }
             return false;
         });
+        fab_sos.setOnClickListener(view -> {
+            Intent intent = new Intent(UserProfileActivity.this, MapsSampleActivity.class);
+            intent.putExtra("showSnackbar", true);
+            startActivity(intent);
+            finish();
 
+
+        });
 
         //hook
         bottomNavigationView = findViewById(R.id.bottomNavView);
@@ -176,6 +186,7 @@ public class UserProfileActivity extends AppCompatActivity {
         }else {
             progressBar.setVisibility(View.VISIBLE);
             showUserProfile(firebaseUser);
+            listRoutes(firebaseUser);
 
         }
 
@@ -183,19 +194,45 @@ public class UserProfileActivity extends AppCompatActivity {
 
     }
 
-    /*
-    @Override
-    public void onBackPressed() {
+    private void listRoutes(FirebaseUser firebaseUser){
+        String userID = firebaseUser.getUid();
+        DatabaseReference routeref = FirebaseDatabase.getInstance().getReference("Routes");
+        routeref.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                LinearLayout linearLayout = findViewById(R.id.profile_routes_list);
+                for (DataSnapshot routes: snapshot.getChildren()){
+                    String title = routes.child("title").getValue(String.class);
+                    String desc = routes.child("desc").getValue(String.class);
+                    String imageUrl = routes.child("imageUrl").getValue(String.class);
+                    View itemView1 = getLayoutInflater().inflate(R.layout.displayroutes_forprofile_list, null);
 
-        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
-            mDrawerLayout.closeDrawer(GravityCompat.START);
-        }else{
-            super.onBackPressed();
-        }
+                    // Set the title and description
+                    TextView titleTextView = itemView1.findViewById(R.id.route_title_profile);
+                    titleTextView.setText(title);
 
+                    TextView descriptionTextView = itemView1.findViewById(R.id.route_desc_profile);
+                    if(desc == null || desc.isEmpty()) {
+                        descriptionTextView.setText("There is no Description for this Route Post");
+                    } else {
+                        descriptionTextView.setText(desc);
+                    }
+
+                    // Load and display the image using Picasso
+                    ImageView imageView = itemView1.findViewById(R.id.route_image_profile);
+                    Picasso.get().load(imageUrl).into(imageView);
+
+                    // Add the item to the LinearLayout
+                    linearLayout.addView(itemView1);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
-
-     */
 
     private void showUserProfile(FirebaseUser firebaseUser) {
         String userID = firebaseUser.getUid();

@@ -2,13 +2,62 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recyclerview_route_data"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/greenish"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="8dp"
     tools:context=".DiscoverUserActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="15dp"
+            android:background="@drawable/bg_searchbutton"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search For Routes" >
+
+        </SearchView>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="20sp"
+        android:padding="15dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:text="Discover Routes"/>
+            <LinearLayout
+                android:id="@+id/layout_discover_list"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="150dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+</LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/progressBat_discover"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -29,7 +78,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="@android:color/transparent"
-
             app:elevation="0dp"
             app:menu="@menu/bottom_nav_menu" />
 
@@ -46,37 +94,9 @@
         app:layout_anchor="@id/bottomAppBar"
         app:maxImageSize="45dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <SearchView
-            android:id="@+id/searchView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:background="@drawable/bg_searchbutton"
-            android:iconifiedByDefault="false"
-            android:queryHint="Search For Routes" />
-
-        <TextView
-            android:id="@+id/PopularRoutes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/cardview_default_elevation"
-            android:text="Popular Routes"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/white"
-            android:textSize="23dp"/>
 
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/userlist"/>
 
-    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -14,6 +14,9 @@ android {
         warning 'deprecation'
     }
 
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
     defaultConfig {
         applicationId "com.example.biketrackcba"
         minSdk 26
@@ -54,7 +57,6 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.android.libraries.places:places:3.2.0'
     implementation 'com.google.maps:google-maps-services:2.2.0'
-    implementation 'com.google.firebase:firebase-messaging:23.2.1'
     implementation 'com.google.firebase:firebase-firestore:24.8.1'
     implementation 'com.google.firebase:firebase-storage:20.2.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'

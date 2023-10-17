@@ -149,6 +149,11 @@ public class LoginUserEmailActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 
     private void loginUser(String textemail, String textpwd) {
         nAuth.signInWithEmailAndPassword(textemail,textpwd).addOnCompleteListener(LoginUserEmailActivity.this,new OnCompleteListener<AuthResult>() {
