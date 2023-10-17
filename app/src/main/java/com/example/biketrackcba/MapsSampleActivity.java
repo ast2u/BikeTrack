@@ -229,7 +229,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         text_Time = findViewById(R.id.D_time_text);
         timerService = new TimerService(new Handler(Looper.getMainLooper()), text_Time);
-
+        text_Distance = findViewById(R.id.D_distance_text);
         otherUsersRef = database.getReference("BikersAvailable");
         refUserSignal = database.getReference("SosSignal");
 
@@ -1021,6 +1021,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     double longit = location.getLongitude();
                     LatLng userL = new LatLng(latit, longit);
 
+
                     if(progressBar.getVisibility()==View.VISIBLE) {
                         progressBar.setVisibility(View.GONE);
                     }
@@ -1032,7 +1033,14 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     text_Speed.setText(speedtext);
 
                     if(startRoutePoints==true){
+
                         routePoints.add(userL);
+                        LatLng startPoint = routePoints.get(0);
+                        Location startLocation = new Location("");
+                        startLocation.setLatitude(startPoint.latitude);
+                        startLocation.setLongitude(startPoint.longitude);
+                        float distanced = startLocation.distanceTo(location);
+                        text_Distance.setText(String.format("%.2f meters", distanced));
                         startRouteTrackingUser();
                         float heading = location.getBearing();
                         // Set the camera position with updated bearing
