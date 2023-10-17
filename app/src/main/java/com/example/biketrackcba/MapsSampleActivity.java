@@ -18,7 +18,7 @@ import com.firebase.geofire.GeoFire;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.Priority;
 
-import com.google.android.gms.maps.CameraUpdate;
+
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -44,7 +44,7 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.android.PolyUtil;
-import com.google.maps.android.SphericalUtil;
+
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 
@@ -52,30 +52,30 @@ import com.google.maps.model.DirectionsResult;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 
 import android.content.pm.PackageManager;
 
-import android.content.res.ColorStateList;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
+
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
+
 import android.location.Location;
 
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
+
 import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Looper;
 ;
-import android.os.PowerManager;
+
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.transition.AutoTransition;
@@ -86,7 +86,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
+
 import android.view.animation.Animation;
 
 import android.view.animation.AnimationUtils;
@@ -94,7 +94,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
+
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -139,7 +139,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Ref;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -210,6 +210,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_sample);
+        locationUpdaterFirebase = new LocationUpdaterFirebase(this);
         progressBar = findViewById(R.id.progressBarMaps);
         sosProgressBar = findViewById(R.id.start_sosButtonLoading);
 
@@ -223,7 +224,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                 .findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
         LocationUtils.checkLocationSettings(this);
-        locationUpdaterFirebase = new LocationUpdaterFirebase(this);
+
         sosMediaplayer = MediaPlayer.create(this, R.raw.sos_sound);
 
         text_Time = findViewById(R.id.D_time_text);
@@ -604,6 +605,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy: STARTED CHECK ME");
         otherUsersRef.removeEventListener(valueEventListener);
         locationUpdaterFirebase.stopLocationFirebaseUpdates();
         String userId = user.getUid();
@@ -611,6 +613,10 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         GeoFire geoFire = new GeoFire(ref);
         geoFire.removeLocation(userId);
         stopLocationUpdates();
+
+
+        
+        
     }
 
 
@@ -1326,7 +1332,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-        Log.d(TAG, "Map is ready!");
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);

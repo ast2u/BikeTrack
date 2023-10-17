@@ -4,9 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-import androidx.viewpager2.widget.ViewPager2;
 
 
 import android.annotation.SuppressLint;
@@ -14,24 +11,20 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+
 import android.net.Uri;
 import android.os.Bundle;
 
-import android.transition.AutoTransition;
-import android.transition.TransitionManager;
-import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+
 
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,8 +34,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.tabs.TabLayout;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,15 +42,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.maps.model.LatLng;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.squareup.picasso.Picasso;
+
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -90,11 +76,16 @@ public class UserProfileActivity extends AppCompatActivity {
         textEm2 = findViewById(R.id.emContacts2);
         topAppbar = findViewById(R.id.topAppBar);
         textVmobile = findViewById(R.id.icd_mobileprofile);
+        messageempty = findViewById(R.id.message_empty_route);
         emergencylayout = findViewById(R.id.edit_errornullemergency);
         emergencylayout2 = findViewById(R.id.show_emergency);
         topAppbar.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if(id==R.id.mLogout){
+                String userId = nAuthprof.getCurrentUser().getUid();
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("BikersAvailable");
+                GeoFire geoFire = new GeoFire(ref);
+                geoFire.removeLocation(userId);
                 Toast.makeText(UserProfileActivity.this,"Logged Out",Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(UserProfileActivity.this, Loginstarter.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -190,10 +181,9 @@ public class UserProfileActivity extends AppCompatActivity {
 
         }
 
-
-
     }
 
+    private TextView messageempty;
     private void listRoutes(FirebaseUser firebaseUser){
         String userID = firebaseUser.getUid();
         DatabaseReference routeref = FirebaseDatabase.getInstance().getReference("Routes");
@@ -201,29 +191,38 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 LinearLayout linearLayout = findViewById(R.id.profile_routes_list);
+                if(snapshot.exists()){
                 for (DataSnapshot routes: snapshot.getChildren()){
+                    messageempty.setVisibility(View.GONE);
                     String title = routes.child("title").getValue(String.class);
                     String desc = routes.child("desc").getValue(String.class);
                     String imageUrl = routes.child("imageUrl").getValue(String.class);
                     View itemView1 = getLayoutInflater().inflate(R.layout.displayroutes_forprofile_list, null);
 
-                    // Set the title and description
-                    TextView titleTextView = itemView1.findViewById(R.id.route_title_profile);
-                    titleTextView.setText(title);
 
-                    TextView descriptionTextView = itemView1.findViewById(R.id.route_desc_profile);
-                    if(desc == null || desc.isEmpty()) {
-                        descriptionTextView.setText("There is no Description for this Route Post");
-                    } else {
-                        descriptionTextView.setText(desc);
-                    }
+                        messageempty.setVisibility(View.VISIBLE);
 
-                    // Load and display the image using Picasso
-                    ImageView imageView = itemView1.findViewById(R.id.route_image_profile);
-                    Picasso.get().load(imageUrl).into(imageView);
+                        // Set the title and description
+                        TextView titleTextView = itemView1.findViewById(R.id.route_title_profile);
+                        titleTextView.setText(title);
 
-                    // Add the item to the LinearLayout
-                    linearLayout.addView(itemView1);
+                        TextView descriptionTextView = itemView1.findViewById(R.id.route_desc_profile);
+                        if (desc == null || desc.isEmpty()) {
+                            descriptionTextView.setText("There is no Description for this Route Post");
+                        } else {
+                            descriptionTextView.setText(desc);
+                        }
+
+                        // Load and display the image using Picasso
+                        ImageView imageView = itemView1.findViewById(R.id.route_image_profile);
+                        Picasso.get().load(imageUrl).into(imageView);
+
+                        // Add the item to the LinearLayout
+                        linearLayout.addView(itemView1);
+
+                }
+                }else{
+                    messageempty.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -300,144 +299,4 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     }
-    private void showRoutesDataUser(FirebaseUser user){
-        String userID = user.getUid();
-
-        DatabaseReference routesRef = FirebaseDatabase.getInstance().getReference("Routes");
-
-        routesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot pointSnap : snapshot.getChildren()){
-                    String routeKey = routesRef.push().getKey();
-                    List<LatLng> routePoints = new ArrayList<>();
-                    for (DataSnapshot pointSnapshot : pointSnap.child(routeKey).child("points").getChildren()) {
-                        double latitude = pointSnapshot.child("latitude").getValue(double.class);
-                        double longitude = pointSnapshot.child("longitude").getValue(double.class);
-
-                        LatLng latLng = new LatLng(latitude, longitude); // Create a LatLng object
-                        routePoints.add(latLng); // Add LatLng to the list
-                    }
-                    String titleR = pointSnap.child("title").getValue(String.class);
-                    String descR = pointSnap.child("desc").getValue(String.class);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-private void generateStaticMapImage(List<LatLng> routePoints,String polyline){
-    String apiKey = "AIzaSyDMINsKu9fJHa_Phb0kq6xYXgDOh3nUXU8"; // Replace with your own API key
-    List<LatLng> decodedRoutePoints = decodePolyline(polyline);
-    String markers = "markers=";
-    for (LatLng point : routePoints) {
-        markers += point.lat + "," + point.lng + "|";
-    }
-    String staticMapUrl = "https://maps.googleapis.com/maps/api/staticmap?" +
-            "center="+ decodedRoutePoints.get(0).lat + "," + decodedRoutePoints.get(0).lng +
-            "&zoom=13" + // Adjust zoom level as needed
-            "&size=600x300" + // Set desired size
-            "&maptype=roadmap" + // Choose map type
-            "&" + markers +
-            "&path=enc:" + polyline + // Add the encoded polyline
-            "&key=" + apiKey;
-    Picasso.get()
-            .load(staticMapUrl)
-            .into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    saveImageToStorage(bitmap);
-                }
-
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                }
-            });
-}
-
-    private void saveImageToStorage(Bitmap bitmap) {
-        String fileName = "static_map_image.png";
-
-        try (FileOutputStream out = new FileOutputStream(new File(getExternalCacheDir(), fileName))) {
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // Save bitmap as PNG
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<LatLng> decodePolyline(String encoded) {
-        List<LatLng> poly = new ArrayList<>();
-        int index = 0, len = encoded.length();
-        int lat = 0, lng = 0;
-
-        while (index < len) {
-            int b, shift = 0, result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1F) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lat += dlat;
-
-            shift = 0;
-            result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1F) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lng += dlng;
-
-            double latitude = lat / 1e5;
-            double longitude = lng / 1e5;
-            poly.add(new LatLng(latitude, longitude));
-        }
-
-        return poly;
-    }
-
-
-/*
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        int id = menuItem.getItemId();
-
-        if(nAuthprof.getCurrentUser()!=null){
-            Menu menu1 = navigationView.getMenu();
-            menu1.findItem(R.id.nav_logout).setVisible(false);
-            menu1.findItem(R.id.nav_profile).setVisible(false);
-        }
-
-        if(id==R.id.nav_home){
-            Intent intent = new Intent(UserProfileActivity.this, MainscreenActivity.class);
-            startActivity(intent);
-        }else if(id==R.id.nav_logout){
-            Toast.makeText(UserProfileActivity.this,"Logged Out",Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(UserProfileActivity.this, Loginstarter.class);
-
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    | Intent.FLAG_ACTIVITY_NEW_TASK);
-            nAuthprof.signOut();
-            startActivity(intent);
-            finish();
-
-        }else{
-            Toast.makeText(UserProfileActivity.this,"Something went wrong!",Toast.LENGTH_LONG).show();
-        }
-
-        return true;
-    }
-
- */
 }

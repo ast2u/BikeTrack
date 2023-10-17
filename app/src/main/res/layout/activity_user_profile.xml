@@ -233,12 +233,20 @@
                 android:layout_marginBottom="10dp"
                 android:textStyle="bold"
                 android:textSize="20sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textView_routesTitle"
+                android:textSize="19sp"
+                android:id="@+id/message_empty_route"
+                android:padding="20dp"
+                android:visibility="gone"
+                android:text="It's empty, start a route record in Maps menu."/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_below="@id/textView_routesTitle"
                 android:id="@+id/profile_routes_list"
                 android:orientation="vertical"
-
                 android:layout_height="wrap_content"/>
 
         </RelativeLayout>
