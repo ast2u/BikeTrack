@@ -61,7 +61,9 @@
                     android:textStyle="bold" />
 
             </LinearLayout>
-
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
             <EditText
                 android:id="@+id/idemail"
                 android:layout_width="match_parent"
@@ -80,6 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:padding="8dp"
+                android:layout_below="@id/idemail"
                 android:drawableLeft="@drawable/baseline_lock_green24"
                 android:drawablePadding="6dp"
                 android:layout_marginTop="20dp"
@@ -90,11 +93,16 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:id="@+id/show_hidepw"
-                android:layout_below="@id/idpassw"
-                android:layout_marginLeft="260dp"
                 android:layout_marginTop="-40dp"
+                android:layout_marginEnd="10dp"
+                android:layout_below="@id/idpassw"
+                android:layout_alignRight= "@id/idpassw"
+                android:src="@drawable/baseline_remove_red_eye_24"
+                android:id="@+id/show_hidepw"
+
+
                 />
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/nLoginbut"

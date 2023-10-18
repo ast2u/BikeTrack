@@ -1065,6 +1065,16 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     }
 
                     if (destination_enabled && isDestination_canceled == false) {
+                        float[] results = new float[1];
+                        Location.distanceBetween(
+                                userL.latitude, userL.longitude, // User's latitude and longitude
+                                destinationLocation.latitude, destinationLocation.longitude, // Destination's latitude and longitude
+                                results);
+
+                        float distanceInMeters = results[0];
+                        String distanceText = String.format("%.2f meters", distanceInMeters);
+                        text_Distance.setText(distanceText);
+
                         float heading = location.getBearing();
                         // Set the camera position with updated bearing
                         CameraPosition cameraPosition = new CameraPosition.Builder()

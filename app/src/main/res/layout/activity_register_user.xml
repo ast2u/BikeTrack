@@ -24,7 +24,7 @@
         android:id="@+id/imageView5"
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:src="@drawable/logoappwide" />
+        android:src="@drawable/logoremastered" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"

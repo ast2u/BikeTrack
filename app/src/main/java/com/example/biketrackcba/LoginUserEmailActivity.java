@@ -60,6 +60,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     private EditText nrName, nrEmail, nrUsername, nrPass, nrMobile, nrBdate;
     private TextView termsLogin;
     private TextView regisLayout, loginLayout;
+    private ImageView hidePwdbutton;
     private DatePickerDialog datepd;
     private Button nLogin, nRegister;
     private FirebaseAuth nAuth;
@@ -86,18 +87,15 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         progressBar1 = findViewById(R.id.progressBarLogin);
         nAuth = FirebaseAuth.getInstance();
 
-        ImageView hidePwdbutton = findViewById(R.id.show_hidepw);
+        hidePwdbutton = findViewById(R.id.show_hidepw);
         hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
-        hidePwdbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(nPass.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
-                    nPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
-                }else{
-                    nPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    hidePwdbutton.setImageResource(R.drawable.baseline_hide_source_24);
-                }
+        hidePwdbutton.setOnClickListener(view -> {
+            if(nPass.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
+                nPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+            }else{
+                nPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                hidePwdbutton.setImageResource(R.drawable.baseline_hide_source_24);
             }
         });
         nLogin.setOnClickListener(new View.OnClickListener() {
@@ -227,18 +225,15 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         nLogin = findViewById(R.id.nLoginbut);
         progressBar1 = findViewById(R.id.progressBarLogin);
         nAuth = FirebaseAuth.getInstance();
-        ImageView hidePwdbutton = findViewById(R.id.show_hidepw);
+        hidePwdbutton = findViewById(R.id.show_hidepw);
         hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
-        hidePwdbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(nPass.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
-                    nPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
-                }else{
-                    nPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    hidePwdbutton.setImageResource(R.drawable.baseline_hide_source_24);
-                }
+        hidePwdbutton.setOnClickListener(view12 -> {
+            if(nPass.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
+                nPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                hidePwdbutton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+            }else{
+                nPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                hidePwdbutton.setImageResource(R.drawable.baseline_hide_source_24);
             }
         });
         nLogin.setOnClickListener(view1 -> {
@@ -263,6 +258,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 loginUser(Lemail, Lpwd);
             }
         });
+
         SpannableString spannableString = new SpannableString(termsLogin.getText());
         ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
