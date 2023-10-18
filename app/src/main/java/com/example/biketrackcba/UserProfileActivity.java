@@ -54,7 +54,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView textEm1, textEm2;
     private GoogleMap gMap;
-    private String usern,fname,Temail,bdate,gender,mobile;
+    private String usern,fname,mobile;
     private String EMnum1, EMnum2;
     private BottomNavigationView bottomNavigationView;
     private LinearLayout emergencylayout,emergencylayout2;
@@ -101,6 +101,9 @@ public class UserProfileActivity extends AppCompatActivity {
                 Intent intent = new Intent(UserProfileActivity.this,EditProfile.class);
                 startActivity(intent);
 
+            }else if (id==R.id.settingnavigation){
+                Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
+                startActivity(intent);
             }
             return false;
         });
@@ -148,23 +151,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
             return false;
         });
-
-
-        /*
-        navigationView = findViewById(R.id.nav_view);
-        setSupportActionBar(findViewById(R.id.univ_toolbar));
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
-
-        navigationView.bringToFront();
-        ActionBarDrawerToggle Dtoggle = new ActionBarDrawerToggle(this,mDrawerLayout,findViewById(R.id.univ_toolbar),
-                R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-        mDrawerLayout.addDrawerListener(Dtoggle);
-        Dtoggle.syncState();
-
-        navigationView.setNavigationItemSelectedListener(this);
-
-         */
 
 
         nAuthprof = FirebaseAuth.getInstance();
@@ -245,20 +231,12 @@ public class UserProfileActivity extends AppCompatActivity {
                 if(readUserDetails!=null){
 
                     fname = firebaseUser.getDisplayName();
-                  //  Temail = firebaseUser.getEmail();
                     usern = readUserDetails.username;
-                  //  bdate = readUserDetails.bdate;
-                  //  gender = readUserDetails.gender;
                     mobile = readUserDetails.mobile;
                     EMnum1 = readUserDetails.emnumber1;
                     EMnum2 = readUserDetails.emnumber2;
-
-
                     textVUsern.setText("Welcome, "+usern+"!");
                     textVFname.setText(fname);
-                //    textVEmail.setText(Temail);
-               //     textVbdate.setText(bdate);
-                //    textVgender.setText(gender);
                     textVmobile.setText(mobile);
                     Uri uri = firebaseUser.getPhotoUrl();
                     if(uri==null) {
@@ -273,8 +251,6 @@ public class UserProfileActivity extends AppCompatActivity {
                     Toast.makeText(UserProfileActivity.this,"Something went wrong!",
                             Toast.LENGTH_LONG).show();
                 }
-
-
 
                 if(EMnum1.isEmpty() && EMnum2.isEmpty()) {
                     emergencylayout.setVisibility(View.VISIBLE);

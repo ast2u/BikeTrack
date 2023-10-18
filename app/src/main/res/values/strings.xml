@@ -13,5 +13,6 @@
         <item>Male</item>
         <item>Female</item>
     </string-array>
+    <string name="infosostext">With Instant SMS Send on it will automatically send message to the available emergency number, while off it will first ask for permission if you want to send SOS message to your registered emergency numbers.</string>
 
 </resources>

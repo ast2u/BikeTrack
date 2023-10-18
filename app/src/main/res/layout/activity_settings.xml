@@ -4,11 +4,312 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".SettingsActivity">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/AccountManagement"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:background="@color/greenish"
+        android:layout_height="wrap_content">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/settingTopAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/baseline_close_24"
+            android:minHeight="?attr/actionBarSize"
+            app:title="Settings"
+            />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/greyish"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:layout_marginBottom="80dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:id="@+id/setting_title1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="10dp"
+                android:text="Preferences"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/greenish"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/darkmodetitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/baseline_dark_mode_24"
+                        android:drawablePadding="20dp"
+                        android:padding="15dp"
+                        android:text="Dark Mode"
+                        android:textColor="@color/black"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/darkmode_pref1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="10dp"
+                        android:switchMinWidth="50dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/darkmodetitle"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="@color/greendark" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/greenish">
+
+                    <TextView
+                        android:id="@+id/textsmstitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/baseline_textsms_24"
+                        android:drawablePadding="20dp"
+                        android:padding="15dp"
+                        android:text="Instant SMS Send"
+                        android:textColor="@color/black"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/sms_pref2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="10dp"
+                        android:switchMinWidth="50dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/textsmstitle"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="@color/greendark" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/greenish">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/baseline_surround_sound_24"
+                        android:drawablePadding="20dp"
+                        android:padding="15dp"
+                        android:text="SOS Sound Alert"
+                        android:textColor="@color/black"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/sos_sound_pref3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="10dp"
+                        android:switchMinWidth="50dp" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="10dp"
+                android:text="@string/infosostext"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/setting_title2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="10dp"
+                android:text="Privacy"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/greenish"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/privatetitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/lockprivacy"
+                        android:drawablePadding="20dp"
+                        android:drawableTint="@color/greendark"
+                        android:padding="15dp"
+                        android:text="Go invisible"
+                        android:textColor="@color/black"
+                        android:textSize="17sp" />
+
+                    <Switch
+                        android:id="@+id/privacy1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="10dp"
+                        android:switchMinWidth="50dp" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="10dp"
+                android:text="Your username and location is displayed publicly on the map. If you don't want to appear in the map, Go invisible."
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/setting_title3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="10dp"
+                android:text="Account"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/greenish"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/direct_accountinfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/greenish"
+                    android:gravity="start"
+                    android:textSize="17sp"
+                    android:padding="20dp"
+                    android:drawablePadding="20dp"
+                    android:drawableStart="@drawable/baseline_person_green24"
+                    android:text="Account Information"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/setting_title4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="10dp"
+                android:text="BikeTrack"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/greenish"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/direct_help"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/greenish"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="17sp"
+                    android:drawablePadding="20dp"
+                    android:drawableStart="@drawable/baseline_help_24"
+                    android:text="Help Guide"
+                    android:textAllCaps="false" />
+                <Button
+                    android:id="@+id/direct_about"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/greenish"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="17sp"
+                    android:drawablePadding="20dp"
+                    android:drawableStart="@drawable/logoappicon"
+                    android:text="About BikeTrack"
+                    android:textAllCaps="false" />
+                <Button
+                    android:id="@+id/direct_aboutM"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/greenish"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="17sp"
+                    android:drawablePadding="20dp"
+                    android:drawableTint="@color/greendark"
+                    android:drawableStart="@drawable/gmaps"
+                    android:text="About Google Maps"
+                    android:textAllCaps="false" />
+                <Button
+                    android:id="@+id/direct_feedback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/greenish"
+                    android:gravity="start"
+                    android:padding="20dp"
+                    android:textSize="17sp"
+                    android:drawablePadding="20dp"
+                    android:drawableStart="@drawable/baseline_feedback_24"
+                    android:text="Send Feedback"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
