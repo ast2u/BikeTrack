@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <!-- Define the solid color for the background -->
+            <solid android:color="@color/greyish" />
+            <!-- Define the corner radii -->
+            <corners android:topLeftRadius="10dp" android:topRightRadius="10dp" />
+        </shape>
+    </item>
+</layer-list>

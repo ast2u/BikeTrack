@@ -94,21 +94,21 @@ public class UserProfileActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else if (id==R.id.more_profile_D) {
-                Intent intent = new Intent(UserProfileActivity.this,MoreUserProfileActivity.class);
+                Intent intent = new Intent(this,MoreUserProfileActivity.class);
                 startActivity(intent);
                 
             } else if (id==R.id.more_editProf) {
-                Intent intent = new Intent(UserProfileActivity.this,EditProfile.class);
+                Intent intent = new Intent(this,EditProfile.class);
                 startActivity(intent);
 
             }else if (id==R.id.settingnavigation){
-                Intent intent = new Intent(UserProfileActivity.this, SettingsActivity.class);
+                Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
             }
             return false;
         });
         fab_sos.setOnClickListener(view -> {
-            Intent intent = new Intent(UserProfileActivity.this, MapsSampleActivity.class);
+            Intent intent = new Intent(this, MapsSampleActivity.class);
             intent.putExtra("showSnackbar", true);
             startActivity(intent);
             finish();
@@ -127,18 +127,16 @@ public class UserProfileActivity extends AppCompatActivity {
 
             int id = item.getItemId();
             if (id==R.id.miHome){
-                Intent intent = new Intent(UserProfileActivity.this, MapsSampleActivity.class);
-                startActivity(intent);
                 finish();
 
 
             } else if (id==R.id.miSocials) {
-                Intent intent = new Intent(UserProfileActivity.this, UserSocialsActivity.class);
+                Intent intent = new Intent(this, UserSocialsActivity.class);
                 startActivity(intent);
                 finish();
 
             } else if (id==R.id.miDiscover) {
-                Intent intent = new Intent(UserProfileActivity.this, DiscoverUserActivity.class);
+                Intent intent = new Intent(this, DiscoverUserActivity.class);
                 startActivity(intent);
                 finish();
 

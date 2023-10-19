@@ -304,6 +304,8 @@ public class LoginUserEmailActivity extends AppCompatActivity {
     public void registerlayoutbutton(View view){
         setContentView(R.layout.activity_register_user);
 
+
+
         termCheckbox=findViewById(R.id.termsCheckBox);
         nrName=findViewById(R.id.idname);
         nrEmail=findViewById(R.id.idemailregis);
@@ -321,7 +323,16 @@ public class LoginUserEmailActivity extends AppCompatActivity {
         nRegister=findViewById(R.id.nRegisterbut);
         progressBar = findViewById(R.id.progressBar);
 
-
+        ImageView eyehide = findViewById(R.id.show_regispw);
+        eyehide.setOnClickListener(v -> {
+            if(nrPass.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
+                nrPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                eyehide.setImageResource(R.drawable.baseline_remove_red_eye_24);
+            }else{
+                nrPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                eyehide.setImageResource(R.drawable.baseline_hide_source_24);
+            }
+        });
 
         SpannableString spannableString = new SpannableString(termCheckbox.getText());
         ClickableSpan clickableSpan = new ClickableSpan() {

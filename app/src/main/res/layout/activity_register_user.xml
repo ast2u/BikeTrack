@@ -184,6 +184,9 @@
                 android:background="@drawable/custom_edittext"
                 android:inputType="number"
                 android:hint="Mobile Number (without +63)" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
             <EditText
                 android:id="@+id/idpasswregis"
                 android:layout_width="match_parent"
@@ -196,6 +199,16 @@
                 android:background="@drawable/custom_edittext"
                 android:inputType="textPassword"
                 android:hint="Password" />
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="-40dp"
+                android:layout_marginEnd="10dp"
+                android:layout_below="@id/idpasswregis"
+                android:layout_alignRight= "@id/idpasswregis"
+                android:src="@drawable/baseline_remove_red_eye_24"
+                android:id="@+id/show_regispw"/>
+            </RelativeLayout>
             <Button
                 android:id="@+id/nRegisterbut"
                 android:layout_width="match_parent"

@@ -54,7 +54,7 @@ public class DiscoverUserActivity extends AppCompatActivity implements SearchVie
         pBarDiscover = findViewById(R.id.progressBat_discover);
         fab= findViewById(R.id.start_sosButton);
         fab.setOnClickListener(view -> {
-            Intent intent = new Intent(DiscoverUserActivity.this, MapsSampleActivity.class);
+            Intent intent = new Intent(this, MapsSampleActivity.class);
             intent.putExtra("showSnackbar", true);
             startActivity(intent);
             finish();
@@ -77,11 +77,9 @@ public class DiscoverUserActivity extends AppCompatActivity implements SearchVie
 
             int id = item.getItemId();
             if (id==R.id.miHome){
-                Intent intent = new Intent(DiscoverUserActivity.this, MapsSampleActivity.class);
-                startActivity(intent);
                 finish();
             } else if (id==R.id.miSocials) {
-                Intent intent = new Intent(DiscoverUserActivity.this, UserSocialsActivity.class);
+                Intent intent = new Intent(this, UserSocialsActivity.class);
                 startActivity(intent);
                 finish();
 
@@ -91,7 +89,7 @@ public class DiscoverUserActivity extends AppCompatActivity implements SearchVie
                 overridePendingTransition(0,0);
 
             } else if (id==R.id.miProfile) {
-                Intent intent = new Intent(DiscoverUserActivity.this,UserProfileActivity.class);
+                Intent intent = new Intent(this,UserProfileActivity.class);
                 startActivity(intent);
                 finish();
 

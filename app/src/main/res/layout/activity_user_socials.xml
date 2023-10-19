@@ -3,25 +3,58 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/greenish"
     android:layout_height="match_parent"
     tools:context=".UserSocialsActivity">
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:background="@color/greenish"
+        android:layout_height="wrap_content">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/socialTopApp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            app:title="Socials"
+            app:navigationIcon="@drawable/baseline_arrow_back_24"
+            app:menu="@menu/social_menubar"
+            />
+    </com.google.android.material.appbar.AppBarLayout>
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        >
-        
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="Create Post"
-            android:background="@color/greenish"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:id="@+id/createpost"
-            android:layout_margin="4dp"/>
-    </LinearLayout>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_marginBottom="70dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:text="Community Posts"/>
+            <LinearLayout
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:id="@+id/listpost_layout"
+                android:orientation="vertical"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:id="@+id/socialprogressbar"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+       />
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
@@ -41,7 +74,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="@android:color/transparent"
-
             app:elevation="0dp"
             app:menu="@menu/bottom_nav_menu"/>
 
@@ -51,7 +83,7 @@
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/start_sosButton"
+        android:id="@+id/directtomapsSOS"
         android:src="@drawable/baseline_sos_24"
         android:elevation="1dp"
         app:maxImageSize="45dp"
