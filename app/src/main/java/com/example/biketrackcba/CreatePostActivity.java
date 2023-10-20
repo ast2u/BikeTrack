@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -31,8 +32,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class CreatePostActivity extends AppCompatActivity {
 private MaterialToolbar createPostToolbar;
@@ -45,6 +49,7 @@ private Switch privacy;
 private StorageReference storageReference;
 private RecyclerView imageRecyclerView;
 private FirebaseUser userF;
+private ProgressBar pbarr;
 private List<Uri> selectedImages = new ArrayList<>();
 private Button createpostButton, addimageButton;
 private ImageAdapter imageAdapter;
@@ -57,6 +62,7 @@ private ImageAdapter imageAdapter;
         addimageButton = findViewById(R.id.addphoto_button);
         createpostButton = findViewById(R.id.social_createthepost);
         bodydescr = findViewById(R.id.socials_body_edit);
+        pbarr=  findViewById(R.id.pbar_createpost);
         privacy = findViewById(R.id.postswitch_privacy);
         nAuth = FirebaseAuth.getInstance();
         userF = nAuth.getCurrentUser();
@@ -110,6 +116,7 @@ private ImageAdapter imageAdapter;
         String titlepost = titlesocialpost.getEditText().getText().toString();
         String bodydescc = bodydescr.getText().toString();
         String pribado = String.valueOf(privacy.isChecked());
+
         postDatabase = FirebaseDatabase.getInstance().getReference("posts").child(userId);
         String postkey = postDatabase.push().getKey();
         if(titlepost.isEmpty()){
@@ -125,6 +132,9 @@ private ImageAdapter imageAdapter;
             bodydescr.setError("Body exceeds the limit");
             bodydescr.requestFocus();
         }else{
+            pbarr.setVisibility(View.VISIBLE);
+            createpostButton.setEnabled(false);
+            addimageButton.setEnabled(false);
         storageReference = FirebaseStorage.getInstance().getReference();
         StorageReference postpics = storageReference.child("socialposts").child(userId);
         for(Uri imageuri:selectedImages){
@@ -135,10 +145,14 @@ private ImageAdapter imageAdapter;
                     imageDownloadUrls.add(uri.toString());
                     if(imageDownloadUrls.size()==selectedImages.size()){
                         postDatabase.child(postkey).child("titlepost").setValue(titlepost);
+                        postDatabase.child(postkey).child("timestamp").setValue(System.currentTimeMillis());
                         postDatabase.child(postkey).child("bodydesc").setValue(bodydescc);
                         postDatabase.child(postkey).child("private").setValue(pribado);
                         postDatabase.child(postkey).child("imageurls").setValue(imageDownloadUrls);
-                        Toast.makeText(this, "Success testing :)",Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Created successfully.",Toast.LENGTH_LONG).show();
+                        pbarr.setVisibility(View.GONE);
+                        createpostButton.setEnabled(true);
+                        addimageButton.setEnabled(true);
                         finish();
                     }
                 });

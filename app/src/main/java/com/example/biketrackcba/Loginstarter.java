@@ -32,10 +32,7 @@ private FirebaseAuth nAuth;
 
             });
         }
-        lgGmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
+        lgGmail.setOnClickListener(view -> {
         });
     }
 

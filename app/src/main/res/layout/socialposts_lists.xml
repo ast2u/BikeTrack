@@ -3,55 +3,75 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+
     android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/forsocial_box1"
+        android:layout_marginBottom="20dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:paddingStart="10dp"
             android:paddingTop="10dp"
+            android:orientation="vertical"
             android:paddingBottom="20dp"
-            android:background="@drawable/forsocial_box"
+
             android:layout_height="wrap_content">
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:id="@+id/fetchRecyclerView"
-            android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:orientation="horizontal"/>
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/userprofile_picsocials"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
-                android:layout_below="@id/fetchRecyclerView"
+                android:layout_marginStart="50dp"
+                android:layout_alignStart="@id/userprofile_picsocials"
                 android:text="loading.."
                 android:id="@+id/userpostsocial"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:layout_marginStart="50dp"
+                android:layout_below="@id/userpostsocial"
+                android:layout_alignStart="@id/userprofile_picsocials"
+                android:text="loading.."
+                android:id="@+id/usertimestamp_id"/>
         </RelativeLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:background="@color/greyish"
+            android:id="@+id/fetchRecyclerView"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="horizontal"/>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/forsocial_box1"
+
         android:layout_marginBottom="25dp"
         android:orientation="vertical">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Loading.."
-        android:paddingTop="10dp"
-        android:paddingStart="15dp"
 
-        android:layout_marginBottom="20dp"
-        android:textColor="@color/white"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:id="@+id/titleofpost"/>
         <TextView
-            android:paddingStart="15dp"
-            android:layout_marginTop="15dp"
+            android:id="@+id/titleofpost"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="15dp"
+            android:paddingStart="15dp"
+
+            android:paddingTop="10dp"
+            android:text="Loading.."
             android:textColor="@color/white"
-            android:text="Description: "/>
-    <TextView
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
         android:layout_width="match_parent"
         android:id="@+id/bodyofpost"
         android:paddingTop="5dp"
@@ -60,6 +80,7 @@
         android:paddingStart="15dp"
         android:text="Loading.."
         android:layout_height="wrap_content"/>
+    </LinearLayout>
     </LinearLayout>
 
 

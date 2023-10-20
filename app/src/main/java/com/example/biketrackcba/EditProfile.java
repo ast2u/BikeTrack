@@ -147,6 +147,7 @@ private StorageReference storageReference;
                     @Override
                     public void onSuccess(Uri uri) {
                         Uri downloadUri = uri;
+                        refer.child("photoUrl").setValue(downloadUri.toString());
                         Fuser = nAuth.getCurrentUser();
                         UserProfileChangeRequest profileupdates = new UserProfileChangeRequest.Builder()
                                 .setPhotoUri(downloadUri)
@@ -158,12 +159,7 @@ private StorageReference storageReference;
                 Toast.makeText(EditProfile.this,"Upload Successful!",Toast.LENGTH_SHORT).show();
 
                 //intent
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(EditProfile.this,e.getMessage(),Toast.LENGTH_SHORT).show();
-                }
-            });
+            }).addOnFailureListener(e -> Toast.makeText(EditProfile.this,e.getMessage(),Toast.LENGTH_SHORT).show());
         }else{
             Toast.makeText(EditProfile.this,"No File Selected!",Toast.LENGTH_SHORT).show();
         }

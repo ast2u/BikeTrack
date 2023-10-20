@@ -176,6 +176,21 @@ tools:context=".MapsSampleActivity" >
                 android:background="@drawable/baseline_center_focus_strong_24" />
         </FrameLayout>
 
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/shape_whitebg">
+            <Button
+                android:id="@+id/sendreport_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/baseline_report_24" />
+        </FrameLayout>
+
     </LinearLayout>
 
     <androidx.cardview.widget.CardView

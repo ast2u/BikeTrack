@@ -38,9 +38,9 @@
                 android:textStyle="bold"
                 android:text="Community Posts"/>
             <LinearLayout
-                android:padding="10dp"
                 android:layout_width="match_parent"
                 android:id="@+id/listpost_layout"
+                android:padding="10dp"
                 android:orientation="vertical"
                 android:layout_height="wrap_content"/>
 

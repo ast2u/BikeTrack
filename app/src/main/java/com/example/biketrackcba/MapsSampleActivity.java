@@ -219,6 +219,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         user = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = user.getUid();
         database = FirebaseDatabase.getInstance();
+
+
         checkLocationPermission();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapFragment);
@@ -1235,6 +1237,8 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                             if (userSnapshot.getKey().equals(currentUserId)) {
                                 continue;
                             }
+                        }else {
+                            Log.d(TAG, "onDataChange: "+ true);
                         }
 
 

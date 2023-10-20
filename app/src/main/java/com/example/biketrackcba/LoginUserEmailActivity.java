@@ -540,12 +540,9 @@ public class LoginUserEmailActivity extends AppCompatActivity {
 
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
                         reference.child(firebaseUser.getUid()).setValue(writeUserDetails).addOnCompleteListener(task1 -> {
-                         //   reference.child(firebaseUser.getUid()).child("emergencynumber").child("em1").setValue("");
-                         //   reference.child(firebaseUser.getUid()).child("emergencynumber").child("em2").setValue("");
-
                             if(task1.isSuccessful()){
-                                firebaseUser.sendEmailVerification();
-
+                                //firebaseUser.sendEmailVerification();
+                                reference.child(firebaseUser.getUid()).child("photoUrl").setValue("");
                                 Toast.makeText(LoginUserEmailActivity.this,"User Registered successfully. Please verify your Email",
                                         Toast.LENGTH_LONG).show();
 
