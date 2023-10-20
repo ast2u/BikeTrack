@@ -13,6 +13,7 @@
         <item>Male</item>
         <item>Female</item>
     </string-array>
+    <string name="longtextreport">Help other cyclist by keeping the map updated, reporting incidents and share your opinion on what changes need in the road for cyclists to be sustainable and safe. Your feedback is also appreciated.</string>
     <string name="infosostext">With Instant SMS Send on it will automatically send message to the available emergency number, while off it will first ask for permission if you want to send SOS message to your registered emergency numbers.</string>
 
 </resources>

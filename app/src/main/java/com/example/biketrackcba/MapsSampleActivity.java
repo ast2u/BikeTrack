@@ -149,6 +149,7 @@ import java.util.Date;
 import java.util.List;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -157,6 +158,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private ProgressBar progressBar, sosProgressBar;
+    private Button reportButton;
     private ValueEventListener valueEventListener;
     private GoogleMap mMap;
 
@@ -219,7 +221,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         user = FirebaseAuth.getInstance().getCurrentUser();
         currentUserId = user.getUid();
         database = FirebaseDatabase.getInstance();
-
+        reportButton = findViewById(R.id.sendreport_button);
 
         checkLocationPermission();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -261,6 +263,15 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
         suggestionList = new ArrayList<>();
         suggestionAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, suggestionList);
+
+        reportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentrep = new Intent(MapsSampleActivity.this, ReportfeedbackActivity.class);
+                startActivity(intentrep);
+                finish();
+            }
+        });
 
         sView = findViewById(R.id.mSearch1_location);
         suggestionsListView.setAdapter(suggestionAdapter);

@@ -104,7 +104,8 @@
                     />
                 <EditText
                     android:id="@+id/socials_body_edit"
-                    android:padding="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingTop="20dp"
                     android:layout_width="match_parent"
                     android:background="@null"
                     android:layout_marginTop="20dp"
@@ -112,6 +113,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:paddingStart="20dp"
+                    android:paddingBottom="100dp"
                     android:hint="What's up?"
                     android:ems="10"
                     android:gravity="start|top"

@@ -383,8 +383,8 @@ tools:context=".MapsSampleActivity" >
         android:layout_height="wrap_content"
         android:id="@+id/start_sosButton"
         android:src="@drawable/baseline_sos_24"
-        android:elevation="1dp"
         app:maxImageSize="45dp"
+        android:elevation="1dp"
         android:backgroundTint="@color/red"
         app:layout_anchor="@id/bottomAppBar"
         />

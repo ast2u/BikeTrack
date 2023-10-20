@@ -157,7 +157,7 @@ private ImageAdapter imageAdapter;
                     }
                 });
             }).addOnFailureListener(e -> {
-                Toast.makeText(this, "error",Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Error in creating the post.",Toast.LENGTH_LONG).show();
             });
         }
         }
