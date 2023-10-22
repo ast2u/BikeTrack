@@ -35,6 +35,8 @@ import com.squareup.picasso.Picasso;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -118,15 +120,13 @@ public class UserSocialsActivity extends AppCompatActivity {
                 LinearLayout linearLayout = findViewById(R.id.listpost_layout);
                 for (DataSnapshot snapusers : usernamesnapshot.getChildren()) {
                     String userIdsocials = snapusers.getKey();
-                    postRef.child(userIdsocials).orderByChild("timestamp")
-                            .limitToLast(5).addListenerForSingleValueEvent(new ValueEventListener() {
+                    postRef.child(userIdsocials).orderByChild("timestamp").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot postshot) {
                             for (DataSnapshot postsnaps : postshot.getChildren()) {
                                 View itemView = getLayoutInflater().inflate(R.layout.socialposts_lists, null);
                                 String photos = snapusers.child("photoUrl").getValue().toString();
                                 Uri uri = Uri.parse(photos);
-                                Log.d(TAG, "onDataChange: "+uri);
                                 String title = postsnaps.child("titlepost").getValue(String.class);
                                 String desc = postsnaps.child("bodydesc").getValue(String.class);
                                long timecheckers = postsnaps.child("timestamp").getValue(long.class);
@@ -160,6 +160,8 @@ public class UserSocialsActivity extends AppCompatActivity {
                                 descbody.setText(desc);
                                 linearLayout.addView(itemView);
                                 pbarsocial.setVisibility(View.GONE);
+
+
                             }
                         }
 

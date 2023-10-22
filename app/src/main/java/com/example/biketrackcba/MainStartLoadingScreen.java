@@ -29,7 +29,7 @@ private LocationUtils2 locationUtils2;
     private static final String[] PERMISSIONS = {
             android.Manifest.permission.ACCESS_FINE_LOCATION,
            android.Manifest.permission.SEND_SMS,
-            android.Manifest.permission.READ_MEDIA_IMAGES
+          //  android.Manifest.permission.READ_MEDIA_IMAGES
     };
 
     private static final int PERMISSION_REQUEST_CODE = 1001;

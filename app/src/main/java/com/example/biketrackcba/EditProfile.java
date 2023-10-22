@@ -161,6 +161,18 @@ private StorageReference storageReference;
                 //intent
             }).addOnFailureListener(e -> Toast.makeText(EditProfile.this,e.getMessage(),Toast.LENGTH_SHORT).show());
         }else{
+            refer.child("photoUrl").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String photourl =snapshot.getValue().toString();
+                    refer.child("photoUrl").setValue(photourl);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(EditProfile.this,"Error null",Toast.LENGTH_SHORT).show();
+                }
+            });
             Toast.makeText(EditProfile.this,"No File Selected!",Toast.LENGTH_SHORT).show();
         }
     }

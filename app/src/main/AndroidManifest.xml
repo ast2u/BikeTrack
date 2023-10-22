@@ -35,9 +35,6 @@
             android:name=".CreatePostActivity"
             android:exported="false" />
         <activity
-            android:name=".PostActivity"
-            android:exported="false" />
-        <activity
             android:name=".EditProfile"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
