@@ -1260,14 +1260,15 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                     Boolean sosSignal = userSnapshot.child("RT_Location/sosAlert").getValue(Boolean.class);
                     String timestamp = userSnapshot.child("RT_Location/timestamp").getValue(String.class);
 
-
+                    if(sosSignal!=null) {
                         if (sosSignal == false) {
                             if (userSnapshot.getKey().equals(currentUserId)) {
                                 continue;
                             }
-                        }else {
-                            Log.d(TAG, "onDataChange: "+ true);
                         }
+                    }else{
+                        Log.e(TAG, "SOS SIGNAL IS NULL");
+                    }
 
 
                     // Create a LatLng object from the retrieved coordinates
@@ -1286,25 +1287,28 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
                             Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap,65, 65, true);
                             BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap);
                             String timeandTxt = timestamp+"\nI Need Help";
-                            
-                            if(sosSignal==false) {
-                                MarkerOptions markerOptions = new MarkerOptions()
-                                        .position(userLocation)
-                                        .title(username)
-                                        .icon(icon);
-                                Marker marker = mMap.addMarker(markerOptions);
-                                marker.setTag(marker);
+                            if(sosSignal!=null) {
+                                if (sosSignal == false) {
+                                    MarkerOptions markerOptions = new MarkerOptions()
+                                            .position(userLocation)
+                                            .title(username)
+                                            .icon(icon);
+                                    Marker marker = mMap.addMarker(markerOptions);
+                                    marker.setTag(marker);
 
-                                otherUsersMarkers.add(marker);
-                            } else if (sosSignal==true) {
-                                MarkerOptions markerOptions = new MarkerOptions()
-                                        .position(userLocation)
-                                        .title(username)
-                                        .snippet(timeandTxt);
-                                Marker marker = mMap.addMarker(markerOptions);
-                                marker.setTag(marker);
-                                otherUserSignalMarker.add(marker);
+                                    otherUsersMarkers.add(marker);
+                                } else if (sosSignal == true) {
+                                    MarkerOptions markerOptions = new MarkerOptions()
+                                            .position(userLocation)
+                                            .title(username)
+                                            .snippet(timeandTxt);
+                                    Marker marker = mMap.addMarker(markerOptions);
+                                    marker.setTag(marker);
+                                    otherUserSignalMarker.add(marker);
 
+                                }
+                            }else{
+                                Log.e(TAG, "SOS SIGNAL IS NULL");
                             }
                         }
                         @Override
