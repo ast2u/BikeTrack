@@ -44,6 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 
@@ -72,6 +73,7 @@ private static final int REQUEST_CODE_IMAGE_PICKER = 1001;
 
 private String encodedImage;
 private FirebaseAuth nAuth;
+private DatabaseReference refpic;
 private Button updateButton;
 private FirebaseUser Fuser;
 private ArrayAdapter<CharSequence> adapter;
@@ -81,6 +83,7 @@ private StorageReference storageReference;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+
         emC1 = findViewById(R.id.PeditText_Econtact1);
         emC2 = findViewById(R.id.PeditText_Econtact2);
         pBar = findViewById(R.id.edit_Pbar);
@@ -93,7 +96,6 @@ private StorageReference storageReference;
         edit_bdate = findViewById(R.id.PeditText_bdate);
         initDatePicker();
         edit_mobilen = findViewById(R.id.PeditText_usernumber);
-
         TV_Fname = findViewById(R.id.textedit_name);
         edit_gender = findViewById(R.id.spinner_gender);
         nAuth = FirebaseAuth.getInstance();
@@ -126,9 +128,9 @@ private StorageReference storageReference;
         });
         updateButton.setOnClickListener(view -> {
            UserUpdate();
-           pBar.setVisibility(View.VISIBLE);
-           UploadPic();
-            finish();
+          // pBar.setVisibility(View.VISIBLE);
+           //UploadPic();
+           // finish();
         });
 
         userProfilePic.setOnClickListener(view -> {
@@ -160,19 +162,8 @@ private StorageReference storageReference;
 
                 //intent
             }).addOnFailureListener(e -> Toast.makeText(EditProfile.this,e.getMessage(),Toast.LENGTH_SHORT).show());
-        }else{
-            refer.child("photoUrl").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String photourl =snapshot.getValue().toString();
-                    refer.child("photoUrl").setValue(photourl);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(EditProfile.this,"Error null",Toast.LENGTH_SHORT).show();
-                }
-            });
+        }else if(uriImage==null){
+            refer.child("photoUrl").setValue("");
             Toast.makeText(EditProfile.this,"No File Selected!",Toast.LENGTH_SHORT).show();
         }
     }
@@ -363,6 +354,7 @@ private StorageReference storageReference;
                 edit_bdate.setError("Birthdate is Required");
                 edit_bdate.requestFocus();
             } else{
+                pBar.setVisibility(View.VISIBLE);
                 UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder()
                         .setDisplayName(outputnewName)
                         .build();
@@ -371,6 +363,9 @@ private StorageReference storageReference;
                         ReadWrite_UserDetails userDetails = new ReadWrite_UserDetails(new_uname,new_bdate,new_gender,new_mobile,new_em1,new_em2);
                         refer.setValue(userDetails).addOnCompleteListener(task1 -> {
                             if(task1.isSuccessful()){
+                                UploadPic();
+                                pBar.setVisibility(View.GONE);
+                                finish();
                                 Toast.makeText(EditProfile.this,"Your Profile has been updated.",
                                                 Toast.LENGTH_LONG).show();
 
@@ -388,6 +383,9 @@ private StorageReference storageReference;
         }else {
             Toast.makeText(EditProfile.this,"Profile has no changes.",
                     Toast.LENGTH_SHORT).show();
+
+            pBar.setVisibility(View.GONE);
+            finish();
 
         }
     }

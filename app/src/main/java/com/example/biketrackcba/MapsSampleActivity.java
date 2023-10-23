@@ -264,13 +264,9 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         suggestionList = new ArrayList<>();
         suggestionAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, suggestionList);
 
-        reportButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intentrep = new Intent(MapsSampleActivity.this, ReportfeedbackActivity.class);
-                startActivity(intentrep);
-                finish();
-            }
+        reportButton.setOnClickListener(v -> {
+            Intent intentrep = new Intent(MapsSampleActivity.this, ReportfeedbackActivity.class);
+            startActivity(intentrep);
         });
 
         sView = findViewById(R.id.mSearch1_location);
@@ -278,7 +274,6 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
         suggestionsListView.setOnItemClickListener((adapterView, view, pos, id) -> {
             String selectedSuggestion = suggestionList.get(pos);
             progressBar.setVisibility(View.VISIBLE);
-
             getPlaceDetails(selectedSuggestion);
             hideSearchView();
             sViewB.setVisibility(View.GONE);
@@ -311,7 +306,28 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
 
 
         sos_button.setOnClickListener(view -> {
-            SosStarted();
+            String uid = user.getUid();
+            DatabaseReference regisUser = FirebaseDatabase.getInstance().getReference("Registered Users").child(uid);
+            regisUser.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String emnumb1 = snapshot.child("emnumber1").getValue().toString();
+                    if(emnumb1.isEmpty()){
+                        Intent intent = new Intent(MapsSampleActivity.this, UserProfileActivity.class);
+                        Toast.makeText(MapsSampleActivity.this, "Please edit your profile and put an Emergency Number!", Toast.LENGTH_LONG).show();
+                        startActivity(intent);
+                    }else{
+                        SosStarted();
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
 
 
         });

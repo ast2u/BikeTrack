@@ -160,7 +160,7 @@ public class LoginUserEmailActivity extends AppCompatActivity {
                 if(task.isSuccessful()){
                     Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
                     FirebaseUser firebaseUser = nAuth.getCurrentUser();
-                    Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
+                  //  Toast.makeText(LoginUserEmailActivity.this,"You are logged in now",Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(LoginUserEmailActivity.this, MapsSampleActivity.class);
                     //Intent intent = new Intent(Intent.ACTION_MAIN);
                     //intent.addCategory(Intent.CATEGORY_APP_EMAIL);
