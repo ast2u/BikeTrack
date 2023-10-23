@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class LocationUpdaterFirebase {
-    private static final long UPDATE_INTERVAL = 1*60*1000; // 1minute
+    private static final long UPDATE_INTERVAL = 50000; // 1minute
     //30*60*1000 = 30mins
     //10*60*1000 = 10mins
     //2*60*1000 = 2mins

@@ -627,6 +627,7 @@ public class MapsSampleActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     protected void onResume() {
         super.onResume();
+        locationUpdaterFirebase.startLocationFirebaseUpdates(this);
         checkLocationPermission();
 
     }
