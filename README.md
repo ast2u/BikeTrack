@@ -7,4 +7,4 @@ transportation vehicles and provide safe and easy navigations to many cyclists.
 
 BikeTrack: An Innovative Mobile GPS-Enabled Application for Group Biking and Safety - Sustainable development goals active within the said project. (Climate action, Sustainable cities and communities, good health).
 
-The api, code, and software are now outdated. It is a project for college project management.
+**The api, code, and software are now outdated. It is a project for college project management.**
