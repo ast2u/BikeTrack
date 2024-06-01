@@ -22,3 +22,9 @@ transportation vehicles and provide safe and easy navigations to many cyclists.
 ![alt text](prototype4.png)
 ![alt text](prototype5.png)
 
+## Resources
+- Firebase = The database for the project. Firebase hold all the data of the users/cyclists.
+- Google APIs = The project used the Google Service for the maps to record the location of the user.
+- Android Studio = The IDE for the project. (Java Programming Language)
+- Android 8-11 = On the production and deployment we used the ranges of 8-11 android version to run the project.
+
