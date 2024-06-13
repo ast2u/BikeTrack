@@ -19,6 +19,7 @@ detecting nearby SOS, creating a social group in the map integration.
 
 ## Prototype Pictures
 *The prototype pictures are outdated*
+
 ![alt text](prototype1.png)
 ![alt text](prototype2.png)
 ![alt text](prototype3.png)
