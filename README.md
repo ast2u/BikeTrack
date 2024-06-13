@@ -6,7 +6,10 @@ especially bicycles, to help the traffic flow in the Philippines in urban areas 
 to record the data and to be a navigation for many cyclists on the road. The system and application will be the goal of the project to help the company in recording the data of many 
 transportation vehicles and provide safe and easy navigations to many cyclists.
 
-# 
+The project focuses on integrating the already existing technology of similar applications. The main application with similar features to the said project is “Waze.” This application 
+has features that allow the users to see the speed that they are going as well as the shortest and most efficient way to get there. The GPS feature for the application can integrate 
+Google Maps on the design and coordinates that can pinpoint the user’s location. The features intended to develop will be pointing out the bicycle lanes, detecting nearby other users, 
+detecting nearby SOS, creating a social group in the map integration.
 
 **BikeTrack: An Innovative Mobile GPS-Enabled Application for Group Biking and Safety**
 - Sustainable development goals active within the said project. (Climate action, Sustainable cities and communities, good health).
@@ -15,7 +18,7 @@ transportation vehicles and provide safe and easy navigations to many cyclists.
 
 
 ## Prototype Pictures
-
+*The prototype pictures are outdated*
 ![alt text](prototype1.png)
 ![alt text](prototype2.png)
 ![alt text](prototype3.png)
