@@ -18,7 +18,7 @@ detecting nearby SOS, creating a social group in the map integration.
 > **The api, code, and software are now outdated. It is a project for college project management.**
 
 
-## Prototype Pictures
+## ~Prototype Pictures (Outdated)~
 *The prototype pictures are outdated*
 
 ![alt text](prototype1.png)
@@ -26,6 +26,11 @@ detecting nearby SOS, creating a social group in the map integration.
 ![alt text](prototype3.png)
 ![alt text](prototype4.png)
 ![alt text](prototype5.png)
+
+## Prototype Pictures
+
+![realpictures](realprototype2.png)
+![realpictures](realprototype3.png)
 
 ## Resources
 - Firebase = The database for the project. Firebase hold all the data of the users/cyclists.
