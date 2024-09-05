@@ -35,6 +35,7 @@ detecting nearby SOS, creating a social group in the map integration.
 
 ## PowerPoint Presentation
 Checkout the powerpoint presentation to showcase more of the prototype: [Presentation.pptx](https://github.com/ast2u/BikeTrack/blob/master/BikeTrack_Project.pptx)
+*Download the file 😀*
 
 ## Resources
 - Firebase = The database for the project. Firebase hold all the data of the users/cyclists.
