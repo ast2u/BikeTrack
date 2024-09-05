@@ -29,8 +29,8 @@ detecting nearby SOS, creating a social group in the map integration.
 
 ## Prototype Pictures
 
+![realpictures](realprototype1.png)
 ![realpictures](realprototype2.png)
-![realpictures](realprototype3.png)
 
 ## Resources
 - Firebase = The database for the project. Firebase hold all the data of the users/cyclists.
