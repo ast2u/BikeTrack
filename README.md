@@ -1,6 +1,6 @@
 # BikeTrack Mobile Application
 
-![BikeTrackLogo](logoapp1.png)
+![BikeTrackLogo](logoassets/logoapp1.png)
 
 A mobile application project that focus on developing the system for the company, Pilipinas Trapikom Corporation. The system will be used to record the data of transportation vehicles 
 especially bicycles, to help the traffic flow in the Philippines in urban areas and create a solution for the problems. The project will also be focusing on creating a mobile application 
@@ -21,16 +21,18 @@ detecting nearby SOS, creating a social group in the map integration.
 ## ~Prototype Pictures (Outdated)~
 *The prototype pictures are outdated*
 
-![alt text](prototype1.png)
-![alt text](prototype2.png)
-![alt text](prototype3.png)
-![alt text](prototype4.png)
-![alt text](prototype5.png)
+![alt text](oldprototypesample/prototype1.png)
+![alt text](oldprototypesample/prototype2.png)
+![alt text](oldprototypesample/prototype3.png)
 
 ## Prototype Pictures
 
-![realpictures](realprototype1.png)
-![realpictures](realprototype2.png)
+![realpictures](prototypesample/realprototype1.png)
+![realpictures](prototypesample/latestprototypeapp2.jpg)
+![realpictures](prototypesample/latestprototypeapp3.jpg)
+![realpictures](prototypesample/latestprototypeapp4.jpg)
+![realpictures](prototypesample/latestprototypeapp9.jpg)
+![realpictures](prototypesample/latestprototypeapp13.jpg)
 
 
 ## PowerPoint Presentation
@@ -44,5 +46,5 @@ Checkout the powerpoint presentation to showcase more of the prototype: [Present
 - Android 8-11 = On the production and deployment we used the ranges of 8-11 android version to run the project.
 
 
-![Ride with BikeTrack](logoapp.png)
+![Ride with BikeTrack](logoassets/logoapp.png)
 
