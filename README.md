@@ -28,7 +28,7 @@ detecting nearby SOS, creating a social group in the map integration.
 ## Prototype Pictures
 
 ![realpictures](prototypesample/realprototype1.png)
-![realpictures](prototypesample/latestprototypeapp2.jpg=250x)
+![realpictures](prototypesample/latestprototypeapp2.jpg)
 ![realpictures](prototypesample/latestprototypeapp3.jpg)
 ![realpictures](prototypesample/latestprototypeapp4.jpg)
 ![realpictures](prototypesample/latestprototypeapp9.jpg)
